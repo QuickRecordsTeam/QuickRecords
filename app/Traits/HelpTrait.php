@@ -470,8 +470,8 @@ trait HelpTrait {
                     $end_date = Carbon::create($year, 12)->endOfQuarter();
                     break;
                 case 12:
-                    $start_date = Carbon::create($year, 6)->endOfQuarter();
-                    $end_date = Carbon::create($year, 12)->endOfQuarter();
+                    $start_date = Carbon::create($year, 1)->startOfQuarter();
+                    $end_date = Carbon::create($year, 6)->endOfQuarter();
                     break;
                 default:
                     $start_date = Carbon::create($year, 2)->startOfQuarter();

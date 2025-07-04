@@ -121,8 +121,6 @@ class ReportGenerationService implements ReportGenerationInterface
 
         $balance_bf = $request->quarter == 6 || $request->quarter == 1 ? 0 : $this->computeBalanceBroughtForwardByQuarter($request, $current_year, $request->quarter);
 
-        dd($balance_bf);
-
         $income_elements = $incomes[0];
 
         $total_income = $incomes[1] + $balance_bf;
@@ -302,6 +300,8 @@ class ReportGenerationService implements ReportGenerationInterface
             }
 
         }
+
+         
         $total_income = collect($incomes)->sum('total');
 
         array_push($quarterly_incomes, $incomes, $total_income);
