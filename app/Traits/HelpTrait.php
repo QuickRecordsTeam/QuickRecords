@@ -156,15 +156,6 @@ trait HelpTrait {
 
        return explode("/", $telephone);
 
-//        if (isset($numbers[1])){
-//            if($numbers[1] != "null"){
-//                $telephone = $numbers[0]."/".$numbers[1];
-//            }else{
-//                $telephone =$numbers[0];
-//            }
-//        }
-
-//        return $telephone;
     }
 
     public function  convertStatusToNumber($status): int
