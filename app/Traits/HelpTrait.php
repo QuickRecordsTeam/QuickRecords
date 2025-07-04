@@ -450,6 +450,7 @@ trait HelpTrait {
                     $end_date = Carbon::create($year, 12)->endOfQuarter();
             }
         }else if($type == self::$BALANCE_BROUGHT_FORWARD){
+             
             switch ($quarter){
                 case 1:
                     $start_date = Carbon::create($year, 2)->startOfQuarter();
@@ -464,9 +465,12 @@ trait HelpTrait {
                     $start_date = Carbon::create($year, 2)->startOfQuarter();
                     $end_date = Carbon::create($year, 9)->endOfQuarter();
                     break;
-                case 12:
                 case 4:
                     $start_date = Carbon::create($year, 2)->startOfQuarter();
+                    $end_date = Carbon::create($year, 12)->endOfQuarter();
+                    break;
+                case 12:
+                    $start_date = Carbon::create($year, 6)->endOfQuarter();
                     $end_date = Carbon::create($year, 12)->endOfQuarter();
                     break;
                 default:

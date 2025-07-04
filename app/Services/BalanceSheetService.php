@@ -62,7 +62,6 @@ class BalanceSheetService implements BalanceSheetInterface {
 
         $column_names = array();
 
-
         foreach ($members as $key => $member){
             $memberPayments = array();
 
@@ -70,13 +69,15 @@ class BalanceSheetService implements BalanceSheetInterface {
 
             $registration_amount = $this->registrationService->getMemberRegistration($session->id, $member->id);
 
+            $reg_bal = ($registration->amount -  $registration_amount);
+
             $savings = $this->userSavingService->getTotalYearlyMemberSavings($session->id, $member->id)->balance_saving;
 
             $balance_saving = $savings ?? 0;
 
             $total_member_year_contribution += ($registration_amount);
 
-            $memberPayments[] = new MemberPaymentItemContributionResource($registration, $registration->id, "Registration", $registration_amount, $registration->amount, ($registration->amount - $registration_amount), "MR", $registration->is_compulsory,
+            $memberPayments[] = new MemberPaymentItemContributionResource($registration, $registration->id, "Registration", $registration_amount, $registration->amount, $reg_bal, "MR", $registration->is_compulsory,
                 PaymentItemType::ALL_MEMBERS, $registration->frequency, $this->getPaymentDurations($registration, "REGISTRATION"), $registration->created_at, "" );
 
             $memberPayments[] = new MemberPaymentItemContributionResource($registration, $member->id, "Savings", $balance_saving, 0, 0, "MS", false, "SAVINGS", "None", [], Carbon::now(), "");
@@ -92,7 +93,8 @@ class BalanceSheetService implements BalanceSheetInterface {
             }
             $total_year_contributions += $total_member_year_contribution;
 
-            $perMemberExpectedAmount = $this->computeTotalExpectedAmountByMemberAndPaymentItem($payment_items, $member);
+            $perMemberExpectedAmount = $this->computeTotalExpectedAmountByMember($payment_items, $registration, $member);
+            
 
             $total_member_year_balance = $perMemberExpectedAmount - $total_member_year_contribution;
 
@@ -113,13 +115,14 @@ class BalanceSheetService implements BalanceSheetInterface {
         return ($this->generateBalanceSheet($request));
     }
 
-    private function computeTotalExpectedAmountByMemberAndPaymentItem($payment_items, $member)
+    private function computeTotalExpectedAmountByMember($payment_items, $registration, $member)
     {
+         
         $total = 0;
         foreach ($payment_items as $payment_item){
             $total += $this->computeExpectedAmountByMemberAndPaymentItem($payment_item, $member);
         }
-        return $total;
+        return $total += $registration->amount;
     }
 
     private function getColumnNameForBalanceSheet($membersYearlyPayments)
