@@ -141,7 +141,8 @@ class ReportGenerationService implements ReportGenerationInterface
     }
 
     public function computeBalanceBroughtForwardByQuarter($request, $current_year, $quarter){
-        $quarter_range = $this->getStartQuarter($current_year->year,  ($quarter - 1), self::$INCOME_ONLY);
+         
+        $quarter_range = $quarter != 12 ? $this->getStartQuarter($current_year->year,  ($quarter - 1), self::$BALANCE_BROUGHT_FORWARD) : $this->getStartQuarter($current_year->year, $quarter, self::$BALANCE_BROUGHT_FORWARD);
 
         $start_quarter = $quarter_range[0];
 
@@ -299,6 +300,8 @@ class ReportGenerationService implements ReportGenerationInterface
             }
 
         }
+
+         
         $total_income = collect($incomes)->sum('total');
 
         array_push($quarterly_incomes, $incomes, $total_income);
