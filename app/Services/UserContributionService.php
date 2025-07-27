@@ -220,7 +220,9 @@ class UserContributionService implements UserContributionInterface, TransactionD
         if (isset($request->filter) && count($request->filter) > 5) {
             $contributions = $contributions->where('users.name', 'LIKE', '%' . $request->filter . '%');
         }
-        $contributions = !is_null($request->per_page) ? $contributions->paginate($request->per_page) : $contributions->get();
+        $perPage = $request->input('per_page', 1000);
+
+        $contributions = !is_null($request->per_page) ? $contributions->paginate($perPage) : $contributions->get();
 
         $total = !is_null($request->per_page) ? $contributions->total() : count($contributions);
         $last_page = !is_null($request->per_page) ? $contributions->lastPage() : 0;

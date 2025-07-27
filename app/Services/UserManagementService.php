@@ -335,7 +335,7 @@ class UserManagementService implements UserManagementInterface
         }
         $filter_users = $filter_users->distinct();
 
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 1000);
 
         $currentPage = $request->input('page', 1);
 
