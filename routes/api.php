@@ -282,6 +282,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('contributions_statistics', [UserContributionController::class, 'getContributionStatistics']);
         Route::get('contributions/members/debts/download', [UserContributionController::class, 'downloadMemberDebts']);
         Route::get('contributions/members/paid_items/download', [UserContributionController::class, 'downloadMemberPaidItems']);
+        Route::get('contributions/members_not_comply/download', [UserContributionController::class, 'downloadMembersNotContributed']);
     });
 
     Route::prefix('protected')->middleware('IsAdminOrIsTreasurer')->group(function () {
