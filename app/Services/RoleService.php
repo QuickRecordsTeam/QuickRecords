@@ -82,7 +82,7 @@ class RoleService implements RoleInterface
             ->select('users.*')
             ->where('roles.name', $assign_role->name)
             ->count();
-        return $assign_role->number_of_members == $users;
+        return $assign_role->number_of_members >= $users;
     }
 
     private function getAssignedRole($role_id, $model_id)
