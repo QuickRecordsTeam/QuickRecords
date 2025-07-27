@@ -12,7 +12,8 @@ use App\Traits\ResponseTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class RoleService implements RoleInterface {
+class RoleService implements RoleInterface
+{
 
     use ResponseTrait, HelpTrait;
 
@@ -21,9 +22,9 @@ class RoleService implements RoleInterface {
         $user = User::findOrFail($user_id);
         $assignRole = CustomRole::findByName($role, 'api');
         $member_has_role = $this->checkIfRoleCanBeAdded($assignRole);
-        if($member_has_role){
+        if ($member_has_role) {
             $this->saveUserRole($user, $assignRole, $updated_by);
-        }else {
+        } else {
             throw new BusinessValidationException("Only one member of your organisation can have this role", 403);
         }
         return $member_has_role;
@@ -34,8 +35,8 @@ class RoleService implements RoleInterface {
         $user = User::findOrFail($user_id);
         $user_role = CustomRole::findByName($role, 'api');
         $assigned_role = $this->getAssignedRole($user_role->id, $user->id);
-        if(!isset($assigned_role)){
-            throw new BusinessValidationException("User does not have this role: ".$role, 404);
+        if (!isset($assigned_role)) {
+            throw new BusinessValidationException("User does not have this role: " . $role, 404);
         }
         $user->removeRole($user_role);
     }
@@ -47,14 +48,16 @@ class RoleService implements RoleInterface {
     }
 
 
-    public function getAllRoles() {
+    public function getAllRoles()
+    {
         return RoleResource::collection(CustomRole::all());
     }
 
 
-    public function findRole($role_name){
+    public function findRole($role_name)
+    {
         $role = CustomRole::findByName($role_name, 'api');
-        if(is_null($role)){
+        if (is_null($role)) {
             return $this->sendError('Role not found', 'The role to be assigned does not exist', 404);
         }
 
@@ -79,7 +82,7 @@ class RoleService implements RoleInterface {
             ->select('users.*')
             ->where('roles.name', $assign_role->name)
             ->count();
-        return $assign_role->number_of_members > $users;
+        return $assign_role->number_of_members == $users;
     }
 
     private function getAssignedRole($role_id, $model_id)

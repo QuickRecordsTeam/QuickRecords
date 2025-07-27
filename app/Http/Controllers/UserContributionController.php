@@ -41,9 +41,9 @@ class UserContributionController extends Controller
 
     public function updateUserContribution(UpdateUserContributionRequest $request,  $id)
     {
-       $this->userContributionService->updateUserContribution($request, $id);
+        $this->userContributionService->updateUserContribution($request, $id);
 
-       return $this->sendResponse('success', 'Contribution updated successfully');
+        return $this->sendResponse('success', 'Contribution updated successfully');
     }
 
 
@@ -74,7 +74,7 @@ class UserContributionController extends Controller
     {
         $this->userContributionService->deleteUserContribution($id);
 
-        return $this->sendResponse( 'success', 'Contribution deleted Successfully');
+        return $this->sendResponse('success', 'Contribution deleted Successfully');
     }
 
 
@@ -101,13 +101,15 @@ class UserContributionController extends Controller
         return $this->sendResponse(new UserContributionResource($contribution), 200);
     }
 
-    public function getContributionsByPaymentItem($id) {
+    public function getContributionsByPaymentItem($id)
+    {
         $contributions = $this->userContributionService->getContributionsByItem($id);
 
         return $this->sendResponse($contributions, 200);
     }
 
-    public function downloadFilteredContributions(Request $request) {
+    public function downloadFilteredContributions(Request $request)
+    {
         $contributions     = $this->filterContributions($request);
         $contributions     = json_decode(json_encode($contributions))->original->data;
         $organisation      = $request->user()->organisation;
@@ -118,7 +120,7 @@ class UserContributionController extends Controller
         $fin_sec           = $admins[Roles::FINANCIAL_SECRETARY];
 
         $data = [
-            'title'             => "Member's Contribution for ".$paymentItem->name,
+            'title'             => "Member's Contribution for " . $paymentItem->name,
             'date'              => date('d/m/Y'),
             'organisation'      => $organisation,
             'contributions'     => $contributions->data,
@@ -136,7 +138,7 @@ class UserContributionController extends Controller
             'payment_durations' => $contributions->payment_durations,
             'member_size'       => $contributions->member_size
         ];
- 
+
         $pdf = PDF::loadView('Contribution.UsersContribution', $data)->setPaper('a4', 'portrait');
 
         $pdf->output();
@@ -147,9 +149,52 @@ class UserContributionController extends Controller
         return $pdf->download('UsersContributions.pdf');
     }
 
+    public function downloadMembersNotContributed(Request $request)
+    {
+        $contributions     = $this->filterContributions($request);
+        $contributions     = json_decode(json_encode($contributions))->original->data;
+        $organisation      = $request->user()->organisation;
+        $admins            = $this->getOrganisationAdministrators();
+        $president         = $admins[Roles::PRESIDENT];
+        $treasurer         = $admins[Roles::TREASURER];
+        $fin_sec           = $admins[Roles::FINANCIAL_SECRETARY];
 
-    public function bulkPayment(BulkPaymentRequest $request){
-         $this->userContributionService->bulkPayment(json_decode(json_encode($request->all())), $request->user()->name);
+
+        $amount_payable = count($contributions->user_data) * $contributions->payment_item->amount;
+        $data = [
+            'title'             => "Member's not Contributed for " . $contributions->payment_item->name,
+            'date'              => date('d/m/Y'),
+            'organisation'      => $organisation,
+            'contributions'     => $contributions,
+            'organisation_telephone'   => $this->setOrganisationTelephone($organisation->telephone),
+            'president'         => $president,
+            'treasurer'         => $treasurer,
+            'fin_secretary'     => $fin_sec,
+            'total'             => 0,
+            'balance'           => $amount_payable,
+            'organisation_logo' => $organisation->logo,
+            'total_deposited_users' => 0,
+            'total_balance_users' => 0,
+            'total_amount_payable' => $amount_payable,
+            'paymentItem'           => $contributions->payment_item,
+            'payment_durations' => [],
+            'member_size'       => count($contributions->user_data)
+        ];
+
+        $pdf = PDF::loadView('Contribution.UsersNotContributed', $data)->setPaper('a4', 'portrait');
+
+        $pdf->output();
+        $domPdf = $pdf->getDomPDF();
+        $canvas = $domPdf->getCanvas();
+        $canvas->page_text(10, $canvas->get_height() - 20, "Page {PAGE_NUM} of {PAGE_COUNT}", null, 10, [0, 0, 0]);
+
+        return $pdf->download('UsersNotContributed.pdf');
+    }
+
+
+    public function bulkPayment(BulkPaymentRequest $request)
+    {
+        $this->userContributionService->bulkPayment(json_decode(json_encode($request->all())), $request->user()->name);
 
         return $this->sendResponse("success", 200);
     }
@@ -195,7 +240,8 @@ class UserContributionController extends Controller
         return $pdf->download('MemberDebts.pdf');
     }
 
-    public function downloadMemberPaidItems(Request $request) {
+    public function downloadMemberPaidItems(Request $request)
+    {
         $organisation      = $request->user()->organisation;
         $debts             = json_decode(json_encode($this->userContributionService->getMemberContributedItems($request->user_id, $request->session_id)));
         $admins            = $this->getOrganisationAdministrators();
@@ -233,7 +279,8 @@ class UserContributionController extends Controller
         return $this->sendResponse($data, 200);
     }
 
-    public function downloadUserContributions(Request $request) {
+    public function downloadUserContributions(Request $request)
+    {
         $contributions      = $this->getUsersContributionsByItem($request->payment_item_id, $request->user_id, $request);
         $contributions      = json_decode(json_encode($contributions))->original->data;
         $organisation      = $request->user()->organisation;
@@ -244,7 +291,7 @@ class UserContributionController extends Controller
         $fin_sec           = $admins[Roles::FINANCIAL_SECRETARY];
 
         $data = [
-            'title'             => $request->user_name." Contributions for ".$request->payment_item_name,
+            'title'             => $request->user_name . " Contributions for " . $request->payment_item_name,
             'date'              => date('d/m/Y'),
             'organisation'      => $organisation,
             'contributions'     => $contributions->data,
@@ -259,7 +306,7 @@ class UserContributionController extends Controller
             'payment_item_frequency'   => $request->payment_item_frequency,
             'organisation_logo'   => $organisation->logo,
             'unpaid_durations'    => $contributions->unpaid_durations,
-            'total_amount_payable'=> $contributions->total_amount_payable,
+            'total_amount_payable' => $contributions->total_amount_payable,
             'paymentItem'        => $paymentItem,
             'payment_durations' => $contributions->payment_durations,
             'member_size'       => $contributions->member_size
@@ -292,7 +339,7 @@ class UserContributionController extends Controller
     private function computeTotal($contributions, $type)
     {
         return collect($contributions)->map(function ($contribution) use ($type) {
-            return $type == "DEBTS"? $contribution->item_amount: $contribution->payment_item_amount;
+            return $type == "DEBTS" ? $contribution->item_amount : $contribution->payment_item_amount;
         })->sum();
     }
 }
