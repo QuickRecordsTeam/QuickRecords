@@ -72,13 +72,25 @@ class UserManagementService implements UserManagementInterface
     {
         $invitation_token = $this->generateSecurityToken(20);
         $auth_user = $request->user();
-        $redirectLink = env('MEMBER_INVITATION_REDIRECT_LINK').$request->role."&key=".$invitation_token;
+        $redirectLink = env('MEMBER_INVITATION_REDIRECT_LINK') . $request->role . "&key=" . $invitation_token;
         $organisation_logo = $auth_user->organisation->logo;
         $year = Carbon::now()->year;
+        $assignedRole = $this->getAssignedRole($request->role);
+
+        if ($this->checkIfRoleCanBeAdded($assignedRole)) {
+            throw new BusinessValidationException("Only one member of your organisation can have this role", 403);
+        }
         try {
-            Mail::to($request->user_email)->send(new InvitationMail($request->user_name, $request->user_email, $redirectLink,
-                $organisation_logo, $auth_user->name, $auth_user->organisation->name, $request->role, $year));
-            $assignedRole = $this->getAssignedRole($request->role);
+            Mail::to($request->user_email)->send(new InvitationMail(
+                $request->user_name,
+                $request->user_email,
+                $redirectLink,
+                $organisation_logo,
+                $auth_user->name,
+                $auth_user->organisation->name,
+                $request->role,
+                $year
+            ));
             MemberInvitation::create([
                 'user_id'               => $request->user_id,
                 'expire_at'             => Carbon::now()->addHours(24),
@@ -86,7 +98,7 @@ class UserManagementService implements UserManagementInterface
                 'role_id'               => $assignedRole->id,
                 'invitation_token'      => $invitation_token
             ]);
-        }catch (Exception $exception){
+        } catch (Exception $exception) {
             throw new BusinessValidationException($exception->getMessage(), 404);
         }
     }
@@ -94,20 +106,21 @@ class UserManagementService implements UserManagementInterface
     public function getUsers($organisation_id)
     {
         return User::where('users.status', SessionStatus::ACTIVE)
-               ->select('users.*')
-               ->distinct()
-               ->orderBy('name')->get();
+            ->select('users.*')
+            ->distinct()
+            ->orderBy('name')->get();
     }
 
-    private function getAllUsersNotRegistered($session_id){
-        return  User::whereDoesntHave('registrations', function ($e) use ($session_id){
+    private function getAllUsersNotRegistered($session_id)
+    {
+        return  User::whereDoesntHave('registrations', function ($e) use ($session_id) {
             return $e->where('session_id', $session_id);
         })->get()->toArray();
     }
     public function getUsersRegistrationStatus($session_id, $paymentStatus)
     {
-        return User::whereHas('registrations', function ($e) use ($session_id, $paymentStatus){
-                  return $e->where('session_id', $session_id)->where('approve', $paymentStatus);
+        return User::whereHas('registrations', function ($e) use ($session_id, $paymentStatus) {
+            return $e->where('session_id', $session_id)->where('approve', $paymentStatus);
         })->get()->toArray();
     }
 
@@ -120,16 +133,16 @@ class UserManagementService implements UserManagementInterface
         $notRegistered = count($this->getAllUsersNotRegistered($session_id));
         $totalUsers = $approvedUsers + $pendingUsers + $declinedUsers + $notRegistered;
 
-        return ["approvedUsers" => ($approvedUsers), "pendingUsers" => ($pendingUsers), "declinedUsers" => ($declinedUsers), "notRegistered" =>($notRegistered), "allUsers" => $totalUsers];
+        return ["approvedUsers" => ($approvedUsers), "pendingUsers" => ($pendingUsers), "declinedUsers" => ($declinedUsers), "notRegistered" => ($notRegistered), "allUsers" => $totalUsers];
     }
 
     public function getRegMemberByMonths($organisation_id, $session_id)
     {
         $data = [];
         $payment_statuses = [PaymentStatus::APPROVED, PaymentStatus::PENDING, PaymentStatus::DECLINED];
-        for ($month = 1; $month <= 12; $month++){
+        for ($month = 1; $month <= 12; $month++) {
             $users_by_status = [];
-            foreach ($payment_statuses as $payment_status){
+            foreach ($payment_statuses as $payment_status) {
                 $users = User::join('member_registrations', 'users.id', '=', 'member_registrations.user_id')
                     ->where('member_registrations.session_id', $session_id)
                     ->where('member_registrations.approve', $payment_status)
@@ -148,9 +161,9 @@ class UserManagementService implements UserManagementInterface
     {
 
         $user = User::leftJoin('member_registrations', 'users.id', '=', 'member_registrations.user_id')
-                   ->where('users.id', $user_id)
-                   ->select('users.*', 'member_registrations.approve')
-                   ->get();
+            ->where('users.id', $user_id)
+            ->select('users.*', 'member_registrations.approve')
+            ->get();
         return ($user[0]);
     }
 
@@ -163,7 +176,8 @@ class UserManagementService implements UserManagementInterface
     }
 
 
-    public function updateMemberProfile($request) {
+    public function updateMemberProfile($request)
+    {
         $user = User::findOrFail($request->user_id);
         $user->update([
             'name'          => $request->name,
@@ -176,7 +190,8 @@ class UserManagementService implements UserManagementInterface
         return $user;
     }
 
-    public function updateProfile($request) {
+    public function updateProfile($request)
+    {
         $user = User::findOrFail($request->user_id);
         $user->update([
             'name'          => $request->name,
@@ -190,7 +205,7 @@ class UserManagementService implements UserManagementInterface
         $currentSession = $this->session_service->getCurrentSession();
         $token = $this->generateToken($user);
 
-        return new TokenResource(new UserResource($updated,$token, true), $currentSession);
+        return new TokenResource(new UserResource($updated, $token, true), $currentSession);
     }
 
     public function deleteUser($user_id)
@@ -211,7 +226,6 @@ class UserManagementService implements UserManagementInterface
             $currentSession = $this->session_service->getCurrentSession();
             return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession);
         }
-
     }
 
     public function createAccount($request)
@@ -244,7 +258,7 @@ class UserManagementService implements UserManagementInterface
     public function updatePassword($request)
     {
         $user = User::findOrFail($request->user_id);
-        if(!Hash::check($request->old_password, $user->password)){
+        if (!Hash::check($request->old_password, $user->password)) {
             throw new UnAuthorizedException("Old Password not match", 403);
         }
         $user->password = Hash::make($request->password);
@@ -255,11 +269,11 @@ class UserManagementService implements UserManagementInterface
     {
         $user = User::where('email', $request->credential)->firstOrFail();
         $member_invitation = MemberInvitation::where('user_id', $user->id)->where('invitation_token', $request->invitation_token)->first();
-        if(isset($member_invitation)){
-            if(Carbon::now()->greaterThan($member_invitation->expire_at)){
+        if (isset($member_invitation)) {
+            if (Carbon::now()->greaterThan($member_invitation->expire_at)) {
                 throw new BusinessValidationException("Member's invitation link has expired. Please request for a new one", 400);
             }
-        }else {
+        } else {
             throw new UnAuthorizedException("Invalid Invitation Link", 403);
         }
 
@@ -278,54 +292,46 @@ class UserManagementService implements UserManagementInterface
 
         $filter_users = User::where('organisation_id', $request->organisation_id);
 
-        if(isset($request->has_register) && $request->has_register == RegistrationStatus::REGISTERED) {
-            $filter_users = $filter_users->whereHas('registrations', function ($query) use ($request){
+        if (isset($request->has_register) && $request->has_register == RegistrationStatus::REGISTERED) {
+            $filter_users = $filter_users->whereHas('registrations', function ($query) use ($request) {
                 $query->where('session_id', $request->year)->where('approve', PaymentStatus::APPROVED);
             });
-
         }
-        if(isset($request->has_register) && $request->has_register == RegistrationStatus::NOT_REGISTERED){
+        if (isset($request->has_register) && $request->has_register == RegistrationStatus::NOT_REGISTERED) {
 
-            $filter_users = User::whereDoesntHave('registrations', function ($e) use ($request){
+            $filter_users = User::whereDoesntHave('registrations', function ($e) use ($request) {
                 return $e->where('session_id', $request->year);
             });
-
         }
-        if(isset($request->has_register) && $request->has_register == PaymentStatus::PENDING){
+        if (isset($request->has_register) && $request->has_register == PaymentStatus::PENDING) {
 
-            $filter_users = $filter_users->whereHas('registrations', function ($query) use ($request){
+            $filter_users = $filter_users->whereHas('registrations', function ($query) use ($request) {
                 $query->where('session_id', $request->year)
                     ->where('approve', PaymentStatus::PENDING);
             });
-
         }
-        if(isset($request->has_register) && $request->has_register == PaymentStatus::DECLINED ){
+        if (isset($request->has_register) && $request->has_register == PaymentStatus::DECLINED) {
 
-            $filter_users = $filter_users->whereHas('registrations', function ($query) use ($request){
+            $filter_users = $filter_users->whereHas('registrations', function ($query) use ($request) {
                 $query->where('session_id', $request->year)
                     ->where('approve', PaymentStatus::DECLINED);
             });
-
         }
-        if(isset($request->has_register) && $request->has_register == SessionStatus::ACTIVE ){
+        if (isset($request->has_register) && $request->has_register == SessionStatus::ACTIVE) {
 
             $filter_users = $filter_users->where('status', SessionStatus::ACTIVE);
-
         }
-        if(isset($request->has_register) && $request->has_register == SessionStatus::IN_ACTIVE){
+        if (isset($request->has_register) && $request->has_register == SessionStatus::IN_ACTIVE) {
 
             $filter_users = $filter_users->where('status', SessionStatus::IN_ACTIVE);
-
         }
-        if(isset($request->gender) && $request->gender != Constants::ALL){
+        if (isset($request->gender) && $request->gender != Constants::ALL) {
 
-           $filter_users = $filter_users->where('gender', $request->gender);
-
+            $filter_users = $filter_users->where('gender', $request->gender);
         }
-        if(isset($request->filter)){
+        if (isset($request->filter)) {
 
-            $filter_users = $filter_users->where('name','LIKE', '%'.$request->filter.'%');
-
+            $filter_users = $filter_users->where('name', 'LIKE', '%' . $request->filter . '%');
         }
         $filter_users = $filter_users->distinct();
 
@@ -337,7 +343,7 @@ class UserManagementService implements UserManagementInterface
 
         $total = $filter_users->total();
 
-        $last_page = !is_null($request->per_page) ? $filter_users->lastPage(): 0;
+        $last_page = !is_null($request->per_page) ? $filter_users->lastPage() : 0;
 
         $per_page = !is_null($request->per_page) ? (int)$filter_users->perPage() : 0;
 
@@ -354,7 +360,7 @@ class UserManagementService implements UserManagementInterface
         $user = User::where('email', $request->email)->firstOrFail();
         $this->validateIfUserCanLogin($user);
         $token = $this->generateSecurityToken(7);
-        $redirectLink = env('PASSWORD_RESET_UI_REDIRECT_LINK').$this->generateSecurityToken(20);
+        $redirectLink = env('PASSWORD_RESET_UI_REDIRECT_LINK') . $this->generateSecurityToken(20);
         $organisation_logo = $user->organisation->logo;
         $year = Carbon::now()->year;
         try {
@@ -367,7 +373,7 @@ class UserManagementService implements UserManagementInterface
                 'user_id' => $user->id,
                 'expire_at' => Carbon::now()->addMinutes(10)
             ]);
-        }catch (Exception $exception){
+        } catch (Exception $exception) {
             throw new EmailException("Could not send reset email link", 550);
         }
     }
@@ -377,12 +383,12 @@ class UserManagementService implements UserManagementInterface
         $request->validate([
             'token' => 'required|string'
         ]);
-        $resetData = PasswordReset::where('token',$request->token)->first();
-        if(isset($resetData)){
-            if(Carbon::now()->greaterThan($resetData->expire_at)){
+        $resetData = PasswordReset::where('token', $request->token)->first();
+        if (isset($resetData)) {
+            if (Carbon::now()->greaterThan($resetData->expire_at)) {
                 throw new BusinessValidationException("Password Reset token has Expired", 400);
             }
-        }else {
+        } else {
             throw new UnAuthorizedException("Invalid token", 403);
         }
 
@@ -391,9 +397,9 @@ class UserManagementService implements UserManagementInterface
 
     public function resetPassword($request)
     {
-        $resetData = PasswordReset::where('token',$request->token)->first();
-        if(isset($resetData)){
-            if(Carbon::now()->greaterThan($resetData->expired_at)){
+        $resetData = PasswordReset::where('token', $request->token)->first();
+        if (isset($resetData)) {
+            if (Carbon::now()->greaterThan($resetData->expired_at)) {
                 throw new UnAuthorizedException("Password Reset token has Expired", 403);
             }
             $user = User::findOrFail($request->user_id);
@@ -407,26 +413,25 @@ class UserManagementService implements UserManagementInterface
             try {
                 $organisation_logo = $user->organisation->logo;
                 Mail::to($user['email'])->send(new PasswordResetConfirmationMailable($user, $organisation_logo, $year));
-            }catch (Exception $exception){
+            } catch (Exception $exception) {
                 throw new EmailException("Could not send reset email link", 550);
             }
             return new TokenResource(new UserResource($user, $token, true), $currentSession);
-        }else {
+        } else {
             throw new UnAuthorizedException("Invalid token", 403);
         }
-
     }
 
     public function getUserByPaymentItem($id, $request)
     {
         $paymentItem = PaymentItem::findOrFail($id);
-        switch ($paymentItem->type){
+        switch ($paymentItem->type) {
             case PaymentItemType::ALL_MEMBERS:
                 $paymentItemMembers = UserResource::collection($this->getUsers($request->organisation_id));
-            break;
+                break;
             default:
                 $paymentItemMembers = $this->getReferenceResource($paymentItem->reference);
-            break;
+                break;
         }
         return $paymentItemMembers;
     }
@@ -438,10 +443,10 @@ class UserManagementService implements UserManagementInterface
             ->join('roles', 'roles.id', '=', 'member_invitations.role_id')
             ->whereNotNull('users.email_verified_at')
             ->select('users.name', 'users.updated_at', 'roles.name as role_name', 'member_invitations.id', 'member_invitations.has_seen_notification')
-            ->orderBy('member_invitations.created_at','DESC')
+            ->orderBy('member_invitations.created_at', 'DESC')
             ->get();
 
-        return collect($notifications)->map(function ($notification){
+        return collect($notifications)->map(function ($notification) {
             return new MemberInviteNotification($notification->id, $notification->name, $notification->role_name, $notification->updated_at, $notification->has_seen_notification);
         })->toArray();
     }
@@ -454,7 +459,7 @@ class UserManagementService implements UserManagementInterface
     }
     public function markAllNotificationsAsRead($request)
     {
-        foreach ($request->all() as $key => $value){
+        foreach ($request->all() as $key => $value) {
             MemberInvitation::findOrFail($value['id'])->update(['has_seen_notification' => true]);
         }
     }
@@ -470,11 +475,15 @@ class UserManagementService implements UserManagementInterface
 
     private function validateIfUserCanLogin($user)
     {
-        if(empty(collect($user->roles)->whereIn('name', [Roles::TREASURER, Roles::FINANCIAL_SECRETARY,
-            Roles::PRESIDENT, Roles::ADMIN])->toArray())){
+        if (empty(collect($user->roles)->whereIn('name', [
+            Roles::TREASURER,
+            Roles::FINANCIAL_SECRETARY,
+            Roles::PRESIDENT,
+            Roles::ADMIN
+        ])->toArray())) {
             throw new UnAuthorizedException("User does not have any Administrator role", 403);
         }
-        if($user->status === SessionStatus::IN_ACTIVE){
+        if ($user->status === SessionStatus::IN_ACTIVE) {
             throw new UnAuthorizedException("User's Account has been deactivated! Please contact the ADMIN or President", 401);
         }
     }
@@ -484,5 +493,15 @@ class UserManagementService implements UserManagementInterface
         return CustomRole::findByName($role, 'api');
     }
 
+    private function checkIfRoleCanBeAdded($assign_role): bool
+    {
+        $users = DB::table('users')
+            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->select('users.*')
+            ->where('roles.name', $assign_role->name)
+            ->count();
 
+        return $assign_role->number_of_members == $users;
+    }
 }

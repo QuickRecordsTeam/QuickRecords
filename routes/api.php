@@ -58,11 +58,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('protected/roles')->group(function () {
-        Route::post('', [RoleController::class, 'addUserRole'])->middleware('isAdmin');
-        Route::get('', [RoleController::class, 'getAllRoles'])->middleware('isAdmin');
+        Route::post('', [RoleController::class, 'addUserRole'])->middleware('isPresidentOrIsAdmin');
+        Route::get('', [RoleController::class, 'getAllRoles'])->middleware('isPresidentOrIsAdmin');
         Route::get('/users/{user_id}', [RoleController::class, 'getUserRoles'])->middleware('isUser');
-        Route::delete('/users/{user_id}', [RoleController::class, 'removeUserRole'])->middleware('isAdmin');
-        Route::put('/update', [RoleController::class, 'updateRole'])->middleware('isAdmin');
+        Route::delete('/users/{user_id}', [RoleController::class, 'removeUserRole'])->middleware('isPresidentOrIsAdmin');
+        Route::put('/update', [RoleController::class, 'updateRole'])->middleware('isPresidentOrIsAdmin');
     });
 
 
@@ -282,6 +282,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('contributions_statistics', [UserContributionController::class, 'getContributionStatistics']);
         Route::get('contributions/members/debts/download', [UserContributionController::class, 'downloadMemberDebts']);
         Route::get('contributions/members/paid_items/download', [UserContributionController::class, 'downloadMemberPaidItems']);
+        Route::get('contributions/members_not_comply/download', [UserContributionController::class, 'downloadMembersNotContributed']);
     });
 
     Route::prefix('protected')->middleware('IsAdminOrIsTreasurer')->group(function () {
