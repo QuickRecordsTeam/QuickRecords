@@ -75,6 +75,11 @@ class UserManagementService implements UserManagementInterface
         $redirectLink = env('MEMBER_INVITATION_REDIRECT_LINK') . $request->role . "&key=" . $invitation_token;
         $organisation_logo = $auth_user->organisation->logo;
         $year = Carbon::now()->year;
+        $assignedRole = $this->getAssignedRole($request->role);
+
+        if ($this->checkIfRoleCanBeAdded($assignedRole)) {
+            throw new BusinessValidationException("Only one member of your organisation can have this role", 403);
+        }
         try {
             Mail::to($request->user_email)->send(new InvitationMail(
                 $request->user_name,
@@ -86,7 +91,6 @@ class UserManagementService implements UserManagementInterface
                 $request->role,
                 $year
             ));
-            $assignedRole = $this->getAssignedRole($request->role);
             MemberInvitation::create([
                 'user_id'               => $request->user_id,
                 'expire_at'             => Carbon::now()->addHours(24),
@@ -461,7 +465,6 @@ class UserManagementService implements UserManagementInterface
     }
     private function generateToken($user)
     {
-        // return  $user->createToken($user->id . '-ApiAuthToken')->plainTextToken;
         return !is_null($user) ? $user->createToken('access-token', $user->roles->toArray())->plainTextToken : "";
     }
 
@@ -488,5 +491,17 @@ class UserManagementService implements UserManagementInterface
     private function getAssignedRole($role)
     {
         return CustomRole::findByName($role, 'api');
+    }
+
+    private function checkIfRoleCanBeAdded($assign_role): bool
+    {
+        $users = DB::table('users')
+            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->select('users.*')
+            ->where('roles.name', $assign_role->name)
+            ->count();
+
+        return $assign_role->number_of_members == $users;
     }
 }

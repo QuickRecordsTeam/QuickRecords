@@ -58,11 +58,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('protected/roles')->group(function () {
-        Route::post('', [RoleController::class, 'addUserRole'])->middleware('isAdmin');
-        Route::get('', [RoleController::class, 'getAllRoles'])->middleware('isAdmin');
+        Route::post('', [RoleController::class, 'addUserRole'])->middleware('isPresidentOrIsAdmin');
+        Route::get('', [RoleController::class, 'getAllRoles'])->middleware('isPresidentOrIsAdmin');
         Route::get('/users/{user_id}', [RoleController::class, 'getUserRoles'])->middleware('isUser');
-        Route::delete('/users/{user_id}', [RoleController::class, 'removeUserRole'])->middleware('isAdmin');
-        Route::put('/update', [RoleController::class, 'updateRole'])->middleware('isAdmin');
+        Route::delete('/users/{user_id}', [RoleController::class, 'removeUserRole'])->middleware('isPresidentOrIsAdmin');
+        Route::put('/update', [RoleController::class, 'updateRole'])->middleware('isPresidentOrIsAdmin');
     });
 
 
