@@ -502,6 +502,6 @@ class UserManagementService implements UserManagementInterface
             ->where('roles.name', $assign_role->name)
             ->count();
 
-        return $users > $assign_role->number_of_members;
+        return $assign_role->number_of_members == $users;
     }
 }
