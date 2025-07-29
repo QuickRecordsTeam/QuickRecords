@@ -22,7 +22,8 @@ class RoleService implements RoleInterface
         $user = User::findOrFail($user_id);
         $assignRole = CustomRole::findByName($role, 'api');
         $member_has_role = $this->checkIfRoleCanBeAdded($assignRole);
-        if ($member_has_role) {
+
+        if (!$member_has_role) {
             $this->saveUserRole($user, $assignRole, $updated_by);
         } else {
             throw new BusinessValidationException("Only one member of your organisation can have this role", 403);
@@ -82,7 +83,8 @@ class RoleService implements RoleInterface
             ->select('users.*')
             ->where('roles.name', $assign_role->name)
             ->count();
-        return  $users > $assign_role->number_of_members;
+        return $assign_role->number_of_members == $users;
+
     }
 
     private function getAssignedRole($role_id, $model_id)
