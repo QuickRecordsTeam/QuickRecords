@@ -31,21 +31,23 @@ class UsersImport implements ToModel, WithStartRow, WithCustomCsvSettings
         return 2;
     }
 
-    public function getCsvSettings():array
+    public function getCsvSettings(): array
     {
         return [
             'delimiter' => ';'
         ];
     }
     /**
-    * @param array $row
-    *
-    * @return void
+     * @param array $row
+     *
+     * @return void
      */
     public function model(array $row)
     {
+        dd($row);
         $exist = User::where('email', $row[1])->where('telephone', str_replace(" ", "", $row[2]))->first();
-        if(! isset($exist)){
+        dd($exist);
+        if (! isset($exist)) {
             $saved = User::create([
                 'name'            => $row[0],
                 'email'           => $row[1],
