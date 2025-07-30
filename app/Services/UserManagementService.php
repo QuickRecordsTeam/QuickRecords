@@ -186,6 +186,7 @@ class UserManagementService implements UserManagementInterface
             'occupation'    => $request->occupation,
             'gender'        => $request->gender,
             'status'        => $request->status,
+            'telephone'     => $request->telephone
         ]);
         return $user;
     }
@@ -200,6 +201,7 @@ class UserManagementService implements UserManagementInterface
             'occupation'    => $request->occupation,
             'gender'        => $request->gender,
             'status'        => $request->status,
+            'telephone'     => $request->telephone
         ]);
         $updated = $user->refresh();
         $currentSession = $this->session_service->getCurrentSession();
