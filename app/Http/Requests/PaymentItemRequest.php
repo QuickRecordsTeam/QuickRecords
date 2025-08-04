@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\AmountPaymentItemValidator;
+use App\Rules\EndRangeAmountPaymentItemValidator;
+use App\Rules\RangePaymentItemValidator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PaymentItemRequest extends FormRequest
 {
@@ -25,13 +29,16 @@ class PaymentItemRequest extends FormRequest
     {
         return [
             'name'          => 'required|max:255',
-            'amount'        => 'required',
+            'amount'        => new AmountPaymentItemValidator,
             'compulsory'    => 'required|boolean',
             'description'   => 'max:4000',
             'type'          => 'required|string',
             'frequency'     => 'required|string',
             'reference'     => '',
             'deadline'      => 'required|date',
+            'is_range'      => 'required|boolean',
+            'start_amount'   => new RangePaymentItemValidator,
+            'end_amount'     => [new RangePaymentItemValidator, new EndRangeAmountPaymentItemValidator]
         ];
     }
 }

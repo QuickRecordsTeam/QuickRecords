@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateUserContributionRequest extends FormRequest
 {
@@ -30,7 +31,8 @@ class CreateUserContributionRequest extends FormRequest
             'payment_item_id'           => 'required|string',
             'quarterly_name'            => '',
             'month_name'                => '',
-            'date'                      => 'required|date'
+            'date'                      => 'required|date',
+            'session_id'                => ['required', Rule::exists('sessions', 'id')]
         ];
     }
 }
