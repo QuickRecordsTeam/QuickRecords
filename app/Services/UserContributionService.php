@@ -352,9 +352,9 @@ class UserContributionService implements UserContributionInterface, TransactionD
             if ($json_data->code == 'REGISTRATION') {
                 $this->saveRegistration($json_data, $user, $auth_user);
             } elseif ($json_data->code == 'CONTRIBUTION') {
-                $payment_item = $this->findPaymentItem($request->payment_item_id);
+                $payment_item = $this->findPaymentItem($payload[$counter]->payment_item_id);
                 if ($payment_item->is_range) {
-                    $this->saveRangeContribution($$json_data, $user->id, $auth_user, $request->current_session_id, $payment_item);
+                    $this->saveRangeContribution($json_data, $user->id, $auth_user, $request->current_session_id, $payment_item);
                 } else {
                     $this->saveContribution($json_data, $user->id, $auth_user, $request->current_session_id, $payment_item);
                 }
