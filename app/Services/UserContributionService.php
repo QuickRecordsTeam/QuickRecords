@@ -40,7 +40,13 @@ class UserContributionService implements UserContributionInterface, TransactionD
 
     public function createUserContribution($request)
     {
-        $this->saveContribution($request, $request->user_id, $request->user()->name, $this->sessionService->getCurrentSession()->id);
+        $payment_item = $this->findPaymentItem($request->payment_item_id);
+        $session_id = !isset($request->session_id) ? $this->sessionService->getCurrentSession()->id : $request->session_id;
+        if ($payment_item->is_range) {
+            $this->saveRangeContribution($request, $request->user_id, $request->user()->name, $session_id, $payment_item);
+        } else {
+            $this->saveContribution($request, $request->user_id, $request->user()->name, $session_id, $payment_item);
+        }
     }
 
     public function updateUserContribution($request, $id) {}
@@ -346,7 +352,12 @@ class UserContributionService implements UserContributionInterface, TransactionD
             if ($json_data->code == 'REGISTRATION') {
                 $this->saveRegistration($json_data, $user, $auth_user);
             } elseif ($json_data->code == 'CONTRIBUTION') {
-                $this->saveContribution($json_data, $user->id, $auth_user, $request->current_session_id);
+                $payment_item = $this->findPaymentItem($request->payment_item_id);
+                if ($payment_item->is_range) {
+                    $this->saveRangeContribution($$json_data, $user->id, $auth_user, $request->current_session_id, $payment_item);
+                } else {
+                    $this->saveContribution($json_data, $user->id, $auth_user, $request->current_session_id, $payment_item);
+                }
             }
         }
     }
@@ -540,10 +551,8 @@ class UserContributionService implements UserContributionInterface, TransactionD
         return UserContribution::findOrFail($id);
     }
 
-    private function saveContribution($request, $user_id, $auth_user, $current_session)
+    private function saveContribution($request, $user_id, $auth_user, $current_session, $payment_item)
     {
-
-        $payment_item = $this->findPaymentItem($request->payment_item_id);
 
         $payment_item_amount = $payment_item->amount;
 
@@ -577,6 +586,43 @@ class UserContributionService implements UserContributionInterface, TransactionD
                 'date'              => $request->date,
             ]);
         }
+
+        if ($request->contributed_via_saving) {
+            $this->userSavingService->deductSavingAfterContribution($user_id, $request->amount_deposited);
+        }
+    }
+
+    private function saveRangeContribution($request, $user_id, $auth_user, $current_session, $payment_item)
+    {
+        $payment_item_amount = $payment_item->start_amount;
+
+        $total_amount_contributed = $this->getTotalAmountPaidByUserForTheItem($user_id, $request->payment_item_id, $request->month_name, $request->quarterly_name, $payment_item->frequency);
+
+        $total_amount_contributed +=  $request->amount_deposited;
+
+        $validAmount = $this->validateAmountDeposited($payment_item_amount, $total_amount_contributed);
+
+        $status = $this->getUserContributionStatus($payment_item_amount, $total_amount_contributed);
+
+        $user_last_contribution = $this->getUserLastContributionByPaymentItem($user_id, $request->payment_item_id, $request->month_name, $request->quarterly_name, $payment_item->frequency);
+
+        $balance_contribution = $this->getMemberLastContribution($user_last_contribution, $payment_item_amount, $request->amount_deposited);
+
+        UserContribution::create([
+            'code'              => $this->generateCode(10),
+            'amount_deposited'  => $request->amount_deposited,
+            'comment'           => $request->comment,
+            'user_id'           => $request->user_id,
+            'payment_item_id'   => $payment_item->id,
+            'status'            => $status,
+            'scan_picture'      => null,
+            'updated_by'        => $auth_user,
+            'balance'           => $validAmount ? 0 : $balance_contribution,
+            'session_id'        => $current_session,
+            'quarterly_name'    => !is_null($request->quarterly_name) ? ($request->quarterly_name) : "",
+            'month_name'        => $request->month_name,
+            'date'              => $request->date,
+        ]);
 
         if ($request->contributed_via_saving) {
             $this->userSavingService->deductSavingAfterContribution($user_id, $request->amount_deposited);
@@ -1254,7 +1300,11 @@ class UserContributionService implements UserContributionInterface, TransactionD
 
         $totalContribution   =  $this->getContributionByUserAndPaymentItem($updatedTransactionData['payment_item_id'], $updatedTransactionData['user_id'])->sum('user_contributions.amount_deposited');
 
-        $payment_item_amount = $this->findPaymentItem($updatedTransactionData['payment_item_id'])['amount'];
+        $payment_item = $this->findPaymentItem($updatedTransactionData['payment_item_id']);
+
+        $payment_item_is_range = $payment_item['is_range'];
+
+        $payment_item_amount = $payment_item_is_range ? $payment_item['start_amount'] : $payment_item['amount'];
 
         $totalAmountContributedWithoutOldDeposition = $totalContribution - $updatedTransactionData->amount_deposited;
 

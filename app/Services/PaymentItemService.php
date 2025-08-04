@@ -30,7 +30,7 @@ class PaymentItemService implements PaymentItemInterface
         $payment_category = PaymentCategory::findOrFail($payment_category_id);
         PaymentItem::create([
             'name'                => $request->name,
-            'amount'              => $request->amount,
+            'amount'              => $request->is_range ? 0 : $request->amount,
             'compulsory'          => $request->compulsory,
             'payment_category_id' => $payment_category->id,
             'description'         => $request->description,
@@ -51,7 +51,7 @@ class PaymentItemService implements PaymentItemInterface
         $updated =  $this->findPaymentItem($payment_item_id, $payment_category_id);
         $updated->update([
             'name'          => $request->name,
-            'amount'        => $request->amount,
+            'amount'        => $request->is_range ? 0 : $request->amount,
             'compulsory'    => $request->compulsory,
             'description'   => $request->description,
             'type'          => $request->type,
