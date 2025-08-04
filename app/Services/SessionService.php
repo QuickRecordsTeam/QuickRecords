@@ -29,14 +29,13 @@ class SessionService implements SessionInterface
     public function createSession($request)
     {
         $previousSession =  Session::where('status', SessionStatus::ACTIVE)->first();
-        if(isset($previousSession)) {
+        if (isset($previousSession)) {
             $previousSession->status = SessionStatus::IN_ACTIVE;
             $previousSession->save();
         }
         Session::create([
             'year'          => $request->year,
             'status'        => SessionStatus::ACTIVE,
-            'updated_by'    => $request->user()->name
         ]);
     }
 
@@ -45,16 +44,13 @@ class SessionService implements SessionInterface
         $currentSession =  Session::where('status', SessionStatus::ACTIVE)->first();
         $updatedSession = Session::findOrFail($id);
 
-        if(SessionStatus::ACTIVE == $request->status && $request->year != $currentSession->year){
+        if (SessionStatus::ACTIVE == $request->status && $request->year != $currentSession->year) {
             $currentSession->status = SessionStatus::IN_ACTIVE;
             $currentSession->save();
-
         }
         $updatedSession->update([
             'status' => $request->status
         ]);
-
-
     }
 
     public function deleteSession($id)

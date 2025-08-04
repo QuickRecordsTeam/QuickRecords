@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App\Traits\GenerateUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ExpenditureDetail extends Model
 {
     use GenerateUuid;
+    use SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;
@@ -24,7 +26,8 @@ class ExpenditureDetail extends Model
         'updated_by'
     ];
 
-    public function expenditureItem() {
+    public function expenditureItem()
+    {
         return $this->belongsTo(ExpenditureItem::class);
     }
 

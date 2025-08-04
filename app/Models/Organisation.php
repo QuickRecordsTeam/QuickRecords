@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Models;
+
 use App\Traits\GenerateUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Organisation extends Model
 {
     use GenerateUuid;
+    use SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;
@@ -26,20 +29,23 @@ class Organisation extends Model
         'logo'
     ];
 
-    public function expenditureCategory() {
+    public function expenditureCategory()
+    {
         return $this->hasMany(ExpenditureCategory::class);
     }
 
-    public function incomeActivity() {
+    public function incomeActivity()
+    {
         return $this->hasMany(IncomeActivity::class);
     }
 
-    public function paymentCategory() {
+    public function paymentCategory()
+    {
         return $this->hasMany(PaymentCategory::class);
     }
 
-    public function users() {
+    public function users()
+    {
         return $this->hasMany(User::class);
     }
-
 }

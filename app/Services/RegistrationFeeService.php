@@ -17,21 +17,19 @@ class RegistrationFeeService implements RegistrationFeeInterface
     public function createRegistrationFee($request)
     {
         $exist_fees = Registration::all()->toArray();
-        if(count($exist_fees) == 0){
+        if (count($exist_fees) == 0) {
             Registration::create([
                 'is_compulsory' => $request->is_compulsory,
                 'amount'        => $request->amount,
                 'status'        => SessionStatus::ACTIVE,
                 'frequency'     => $request->frequency,
-                'updated_by'    => $request->user()->name
             ]);
-        }else {
+        } else {
             Registration::create([
                 'is_compulsory' => $request->is_compulsory,
                 'amount'        => $request->amount,
                 'status'        => SessionStatus::IN_ACTIVE,
                 'frequency'     => $request->frequency,
-                'updated_by'    => $request->user()->name
             ]);
         }
     }
@@ -39,7 +37,7 @@ class RegistrationFeeService implements RegistrationFeeInterface
     public function updateRegistrationFee($request, $id)
     {
         $activeRegFee = Registration::where('status', SessionStatus::ACTIVE)->first();
-        if(SessionStatus::ACTIVE == $request->status){
+        if (SessionStatus::ACTIVE == $request->status) {
             $activeRegFee->update([
                 'status' => SessionStatus::IN_ACTIVE
             ]);

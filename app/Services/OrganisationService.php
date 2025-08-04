@@ -25,11 +25,9 @@ class OrganisationService implements OrganisationInterface
                 'salutation'       => $request->salutation,
                 'box_number'       => $request->box_number,
                 'region'           => $request->region,
-                'updated_by'       => $request->user()->name,
             ]);
             $user->update([
                 'organisation_id' => $saved->id,
-                'updated_by'      => $request->user()->name
             ]);
             $save_organ = $saved;
         } else {
@@ -40,8 +38,6 @@ class OrganisationService implements OrganisationInterface
             $organisation->address          = $request->address;
             $organisation->salutation       = $request->salutation;
             $organisation->box_number       = $request->box_number;
-            $organisation->updated_by       = $request->user()->name;
-
             $organisation->save();
 
             $save_organ = $organisation;
@@ -58,7 +54,7 @@ class OrganisationService implements OrganisationInterface
     public function getOrganisationInfo()
     {
         $id = null;
-        if(!is_null(Auth::user()->organisation)){
+        if (!is_null(Auth::user()->organisation)) {
             $id = Auth::user()->organisation->id;
         }
         return Organisation::findOrFail($id);

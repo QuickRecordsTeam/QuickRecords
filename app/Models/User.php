@@ -1,17 +1,20 @@
 <?php
+
 namespace App\Models;
 
+use App\Observers\UserObserver;
 use App\Traits\GenerateUuid;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 
-
 class User extends Authenticatable
 {
     use HasRoles, Notifiable, HasApiTokens;
     use GenerateUuid;
+    use SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;
@@ -47,7 +50,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -61,20 +65,24 @@ class User extends Authenticatable
 
     protected  $guard_name = "api";
 
-    public function userSaving(){
+    public function userSaving()
+    {
         return $this->hasMany(UserSaving::class);
     }
 
-    public function userContributions() {
+    public function userContributions()
+    {
         return $this->hasMany(UserContribution::class);
     }
 
-    public function organisation() {
+    public function organisation()
+    {
         return $this->belongsTo(Organisation::class);
     }
 
 
-    public function registrations() {
+    public function registrations()
+    {
         return $this->hasMany(MemberRegistration::class);
     }
 
@@ -82,5 +90,4 @@ class User extends Authenticatable
     {
         return  $this->hasMany(CustomRole::class);
     }
-
 }

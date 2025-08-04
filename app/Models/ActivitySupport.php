@@ -5,11 +5,13 @@ namespace App\Models;
 use App\Traits\GenerateUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ActivitySupport extends Model
 {
     use HasFactory;
     use GenerateUuid;
+    use SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;

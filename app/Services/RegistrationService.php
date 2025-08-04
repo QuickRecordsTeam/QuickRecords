@@ -33,15 +33,14 @@ class RegistrationService implements RegistrationInterface, TransactionDataGroup
         $user = User::findOrFail($request->user_id);
         $exist_user = MemberRegistration::where('session_id', $current_session->id)->where('user_id', $user->id)->first();
         $reg_fee = $this->registrationFeeService->getCurrentRegistrationFee();
-        if(is_null($exist_user)){
+        if (is_null($exist_user)) {
             MemberRegistration::create([
                 'user_id'           => $user->id,
                 'session_id'        => $current_session->id,
-                'updated_by'        => $request->user()->name,
                 'month_name'        => $request->month_name,
                 'registration_id'   => $reg_fee->id
             ]);
-        }else {
+        } else {
             $exist_user->approve = PaymentStatus::PENDING;
             $exist_user->save();
         }
@@ -59,7 +58,7 @@ class RegistrationService implements RegistrationInterface, TransactionDataGroup
     {
         $current_session = $this->sessionService->getCurrentSession();
         $registrations = MemberRegistration::where('session_id', $current_session->id);
-        if(!is_null($request->status) && $request->status != "ALL"){
+        if (!is_null($request->status) && $request->status != "ALL") {
             $registrations = $registrations->where('member_registrations.approve', $request->status);
         }
         return $registrations->orderBy('users.name', 'DESC')->get();
@@ -83,9 +82,9 @@ class RegistrationService implements RegistrationInterface, TransactionDataGroup
     {
 
         $registrations = MemberRegistration::where('session_id', $session_id)
-                        ->where('approve', PaymentStatus::APPROVED)
-                        ->whereBetween('created_at', [$start_quarter, $end_quarter])
-                        ->get();
+            ->where('approve', PaymentStatus::APPROVED)
+            ->whereBetween('created_at', [$start_quarter, $end_quarter])
+            ->get();
         $totalReg = collect($registrations)->map(function ($e) {
             return $e->registration->amount;
         })->sum();
@@ -106,7 +105,8 @@ class RegistrationService implements RegistrationInterface, TransactionDataGroup
         return new QuarterlyIncomeResource($code, Constants::MEMBERS_REGISTRATION, [], $totalReg);
     }
 
-    public function getMemberRegistration($session_id, $user_id){
+    public function getMemberRegistration($session_id, $user_id)
+    {
         $registrations = MemberRegistration::where('session_id', $session_id)
             ->where('approve', PaymentStatus::APPROVED)
             ->where('user_id', $user_id)

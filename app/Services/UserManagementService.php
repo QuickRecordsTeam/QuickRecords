@@ -60,7 +60,6 @@ class UserManagementService implements UserManagementInterface
             'address'         => $request->address,
             'occupation'      => $request->occupation,
             'organisation_id' => $id,
-            'updated_by'      => $request->user()->name,
             'status'          => SessionStatus::ACTIVE
         ]);
 

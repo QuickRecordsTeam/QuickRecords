@@ -36,7 +36,6 @@ class ActivitySupportService implements ActivitySupportInterface, TransactionDat
             'supporter' => $request->supporter,
             'payment_item_id' => $payment_item->id,
             'scan_picture' => $request->scan_picture,
-            'updated_by' => $request->user()->name,
             'session_id' => $current_session->id
         ]);
     }
@@ -51,7 +50,6 @@ class ActivitySupportService implements ActivitySupportInterface, TransactionDat
             'supporter' => $request->supporter,
             'payment_item_id' => $payment_item->id,
             'scan_picture' => $request->scan_picture,
-            'updated_by' => $request->user()->name,
         ]);
     }
 
@@ -59,7 +57,6 @@ class ActivitySupportService implements ActivitySupportInterface, TransactionDat
     {
         $current_session = $this->sessionService->getCurrentSession();
         return ActivitySupport::where('payment_item_id', $id)->where('session_id', $current_session->id)->orderBy('created_at', 'DESC')->get();
-
     }
 
     public function getActivitySupport($id)
@@ -109,8 +106,14 @@ class ActivitySupportService implements ActivitySupportInterface, TransactionDat
         $total_sponsorship = $this->computeTotalSponsorship($sponsorships->get());
         $paginated_data = $sponsorships->paginate($request->per_page);
 
-        return new ActivitySupportCollection($paginated_data, $total_sponsorship, $paginated_data->total(),
-            $paginated_data->lastPage(), (int)$paginated_data->perPage(), $paginated_data->currentPage());
+        return new ActivitySupportCollection(
+            $paginated_data,
+            $total_sponsorship,
+            $paginated_data->total(),
+            $paginated_data->lastPage(),
+            (int)$paginated_data->perPage(),
+            $paginated_data->currentPage()
+        );
     }
 
     public function changeActivityState($id, $request)
@@ -181,5 +184,4 @@ class ActivitySupportService implements ActivitySupportInterface, TransactionDat
 
         return $updatedTransactionData->save();
     }
-
 }

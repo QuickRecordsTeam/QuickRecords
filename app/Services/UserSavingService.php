@@ -34,7 +34,6 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
             'amount_deposited'      => $request->amount_deposited,
             'comment'               => $request->comment,
             'user_id'               => $user->id,
-            'updated_by'            => $request->user()->name,
             'session_id'            => $current_session->id,
         ]);
     }
@@ -42,13 +41,13 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
     public function updateUserSaving($request, $id, $user_id)
     {
         $saving = $this->findUserSaving($id, $user_id);
-        if($saving->approve == PaymentStatus::PENDING){
+        if ($saving->approve == PaymentStatus::PENDING) {
             $saving->update([
                 'amount_deposited'      => $request->amount_deposited,
                 'comment'               => $request->comment,
             ]);
-        }else {
-            throw new BusinessValidationException("Saving cannot be updated after been ". $saving->approve, 403);
+        } else {
+            throw new BusinessValidationException("Saving cannot be updated after been " . $saving->approve, 403);
         }
     }
 
@@ -56,10 +55,10 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
     {
         $user = User::findOrFail($user_id);
         $savings = $user->userSaving();
-        if(isset($request->month)){
+        if (isset($request->month)) {
             $savings  = $savings->whereMonth('user_savings.created_at', $request->month);
         }
-        if(isset($request->status) && $request->status != "ALL"){
+        if (isset($request->status) && $request->status != "ALL") {
             $savings = $savings->where('user_savings.approve', $request->status);
         }
         $savings = $savings->orderBy('created_at');
@@ -67,8 +66,14 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
 
         $paginated_savings = $savings->paginate($request->per_page);
 
-         return new UserSavingCollection($paginated_savings, $total, $paginated_savings->total(), $paginated_savings->lastPage(),
-            $paginated_savings->perPage(), $paginated_savings->currentPage());
+        return new UserSavingCollection(
+            $paginated_savings,
+            $total,
+            $paginated_savings->total(),
+            $paginated_savings->lastPage(),
+            $paginated_savings->perPage(),
+            $paginated_savings->currentPage()
+        );
     }
 
 
@@ -103,8 +108,14 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
 
         $paginated_savings = $savings->paginate($request->per_page);
 
-        return new UserSavingCollection($savings->get(), $total_amount_deposited, $paginated_savings->total(), $paginated_savings->lastPage(),
-            (int)$paginated_savings->perPage(), $paginated_savings->currentPage());
+        return new UserSavingCollection(
+            $savings->get(),
+            $total_amount_deposited,
+            $paginated_savings->total(),
+            $paginated_savings->lastPage(),
+            (int)$paginated_savings->perPage(),
+            $paginated_savings->currentPage()
+        );
     }
 
 
@@ -120,18 +131,18 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
 
         $total = $this->calculateTotalSaving($savings);
 
-        return new UserSavingCollection($savings, $total);
+        return new UserSavingCollection($savings, $total, 1, 1, 10, 1);
     }
 
     public function getMemberSavingPerQuarter($code, $session_id, $start_quarter, $end_quarter)
     {
         $total = 0;
         $savings = UserSaving::where('approve', PaymentStatus::APPROVED)
-                    ->where('session_id', $session_id)
-                    ->whereBetween('created_at', [$start_quarter, $end_quarter])
-                    ->selectRaw('SUM(amount_deposited) as amount')
-                    ->get();
-        if(isset($savings[0]->amount)){
+            ->where('session_id', $session_id)
+            ->whereBetween('created_at', [$start_quarter, $end_quarter])
+            ->selectRaw('SUM(amount_deposited) as amount')
+            ->get();
+        if (isset($savings[0]->amount)) {
             $total = $savings[0]->amount;
         }
         return new QuarterlyIncomeResource($code, Constants::MEMBERS_SAVINGS, [], $total);
@@ -157,7 +168,7 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
     {
         return collect($savings)->filter(function ($record) {
             return $record->approve !== PaymentStatus::DECLINED;
-        })->map(function ($saving){
+        })->map(function ($saving) {
             return ($saving->amount_deposited - $saving->amount_used);
         })->sum();
     }
@@ -168,12 +179,12 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
 
         $savings = UserSaving::where('user_savings.session_id', $session_id);
 
-        if(isset($month)){
+        if (isset($month)) {
             $savings = $savings->whereMonth('user_savings.created_at', $month);
         }
-        if(isset($filter)){
-            $savings = $savings->whereHas('user', function ($query) use ($filter){
-                $query->where('name', 'LIKE', '%'.$filter.'%');
+        if (isset($filter)) {
+            $savings = $savings->whereHas('user', function ($query) use ($filter) {
+                $query->where('name', 'LIKE', '%' . $filter . '%');
             });
         }
         return $savings->selectRaw('(SUM(user_savings.amount_deposited) - SUM(user_savings.amount_used)) as total_amount, user_id, session_id,
@@ -183,14 +194,15 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
     }
 
 
-    public function getUserSavingsForDownload($request) {
+    public function getUserSavingsForDownload($request)
+    {
 
         $savings = UserSaving::where('user_id', $request->user_id);
 
-        if(isset($request->month)){
+        if (isset($request->month)) {
             $savings  = $savings->whereMonth('created_at', $request->month);
         }
-        if(isset($request->status) && $request->status != "ALL"){
+        if (isset($request->status) && $request->status != "ALL") {
             $savings = $savings->where('approve', $request->status);
         }
         $savings = $savings->orderBy('created_at')->get();
@@ -219,28 +231,28 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
 
         $data = UserSaving::where('user_savings.session_id', $request->session_id);
 
-        if(!is_null($request->name)){
+        if (!is_null($request->name)) {
             $name = $request->name;
-            $data = $data->whereHas('user', function ($query) use ($name){
-                $query->where('name', 'LIKE', '%'.$name.'%');
+            $data = $data->whereHas('user', function ($query) use ($name) {
+                $query->where('name', 'LIKE', '%' . $name . '%');
             });
         }
-        if(!is_null($request->date)){
+        if (!is_null($request->date)) {
             $data = $data->whereDate('user_savings.created_at', $request->date);
         }
-        if($request->amount_deposited > 0) {
+        if ($request->amount_deposited > 0) {
             $data = $data->where('user_savings.amount_deposited', $request->amount_deposited);
         }
-        if(!is_null($request->status) && $request->status != "ALL") {
+        if (!is_null($request->status) && $request->status != "ALL") {
             $data = $data->where('user_savings.approve', $request->status);
         }
         if (!is_null($request->month)) {
             $data = $data->whereMonth('user_savings.created_at', $request->month);
         }
-        if(isset($request->filter)) {
+        if (isset($request->filter)) {
             $filter = $request->filter;
-            $data = $data->whereHas('user', function ($query) use ($filter){
-                $query->where('name', 'LIKE', '%'.$filter.'%');
+            $data = $data->whereHas('user', function ($query) use ($filter) {
+                $query->where('name', 'LIKE', '%' . $filter . '%');
             });
         }
 
@@ -252,8 +264,14 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
         $total_amount_deposited = $this->calculateOrganisationTotalSavings($savings->get());
         $paginated_savings      = $savings->paginate($request->per_page);
 
-        return new UserSavingCollection($savings->get(), $total_amount_deposited, $paginated_savings->total(), $paginated_savings->lastPage(),
-            (int)$paginated_savings->perPage(), $paginated_savings->currentPage());
+        return new UserSavingCollection(
+            $savings->get(),
+            $total_amount_deposited,
+            $paginated_savings->total(),
+            $paginated_savings->lastPage(),
+            (int)$paginated_savings->perPage(),
+            $paginated_savings->currentPage()
+        );
     }
 
     public function deductSavingAfterContribution($user_id, $amount)
@@ -266,9 +284,9 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
 
     public function getSavingsStatistics($request)
     {
-         $monthly_stat = $this->getTotalMonthlySavings($request);
-         $yearly_stat = $this->getTotalYearlySavings();
-         $status_stat =  $this->getSavingsStatByStatus($request->session_id);
+        $monthly_stat = $this->getTotalMonthlySavings($request);
+        $yearly_stat = $this->getTotalYearlySavings();
+        $status_stat =  $this->getSavingsStatByStatus($request->session_id);
 
         return ['monthly_stat' => $monthly_stat, 'yearly_stat' => $yearly_stat, 'status_stat' => $status_stat];
     }
@@ -276,21 +294,21 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
     public function getTotalYearlyMemberSavings($session_id, $user_id)
     {
         return UserSaving::where('user_id', $user_id)
-                 ->where('approve', PaymentStatus::APPROVED)
-                 ->where('session_id', $session_id)
-                 ->selectRaw('SUM(amount_deposited) - SUM(amount_used) as balance_saving')->first();
+            ->where('approve', PaymentStatus::APPROVED)
+            ->where('session_id', $session_id)
+            ->selectRaw('SUM(amount_deposited) - SUM(amount_used) as balance_saving')->first();
     }
 
     private function getTotalMonthlySavings($request)
     {
         $total_monthly_savings = [];
-        for ($counter = 1; $counter <= 12; $counter++){
+        for ($counter = 1; $counter <= 12; $counter++) {
             $savings = UserSaving::where('session_id', $request->session_id)
-                                  ->where('approve', PaymentStatus::APPROVED)
-                                  ->whereMonth('created_at', $counter)
-                                  ->selectRaw('SUM(amount_deposited) - SUM(amount_used) as total_saving')->first();
+                ->where('approve', PaymentStatus::APPROVED)
+                ->whereMonth('created_at', $counter)
+                ->selectRaw('SUM(amount_deposited) - SUM(amount_used) as total_saving')->first();
 
-            isset($savings->total_saving)? array_push($total_monthly_savings, $savings->total_saving) : array_push($total_monthly_savings, 0);
+            isset($savings->total_saving) ? array_push($total_monthly_savings, $savings->total_saving) : array_push($total_monthly_savings, 0);
         }
         return $total_monthly_savings;
     }
@@ -300,11 +318,11 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
         $total_yearly_savings = [];
         $sessions = $this->sessionService->getAllSessions();
 
-        foreach ($sessions as $session){
+        foreach ($sessions as $session) {
             $savings = UserSaving::where('session_id', $session->id)
-                                 ->where('approve', PaymentStatus::APPROVED)
-                                 ->selectRaw('SUM(amount_deposited) - SUM(amount_used) as total_saving')->first();
-            isset($savings->total_saving)? array_push($total_yearly_savings, ["amount" =>$savings->total_saving, "year" => $session->year]) : array_push($total_yearly_savings, 0);
+                ->where('approve', PaymentStatus::APPROVED)
+                ->selectRaw('SUM(amount_deposited) - SUM(amount_used) as total_saving')->first();
+            isset($savings->total_saving) ? array_push($total_yearly_savings, ["amount" => $savings->total_saving, "year" => $session->year]) : array_push($total_yearly_savings, 0);
         }
         return $total_yearly_savings;
     }
@@ -316,12 +334,12 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
         $savings = UserSaving::where('session_id', $current_session)->get();
 
         $saving_collect = collect($savings)->groupBy('approve')->toArray();
-        if($saving_collect < 0){
+        if ($saving_collect < 0) {
             return [0, 0, 0];
-        }else {
-            isset($saving_collect['PENDING']) ? array_push($savings_by_status, count($saving_collect['PENDING'])): array_push($savings_by_status, 0);
-            isset($saving_collect['APPROVED']) ? array_push($savings_by_status, count($saving_collect['APPROVED'])): array_push($savings_by_status,  0);
-            isset($saving_collect['DECLINED']) ? array_push($savings_by_status, count($saving_collect['DECLINED'])): array_push($savings_by_status, 0);
+        } else {
+            isset($saving_collect['PENDING']) ? array_push($savings_by_status, count($saving_collect['PENDING'])) : array_push($savings_by_status, 0);
+            isset($saving_collect['APPROVED']) ? array_push($savings_by_status, count($saving_collect['APPROVED'])) : array_push($savings_by_status,  0);
+            isset($saving_collect['DECLINED']) ? array_push($savings_by_status, count($saving_collect['DECLINED'])) : array_push($savings_by_status, 0);
         }
 
         return $savings_by_status;

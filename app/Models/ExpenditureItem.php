@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\GenerateUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @method static create(array $array)
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ExpenditureItem extends Model
 {
-    use GenerateUuid;
+    use GenerateUuid, SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;
@@ -31,7 +32,8 @@ class ExpenditureItem extends Model
         'session_id'
     ];
 
-    public function expenditureDetails() {
+    public function expenditureDetails()
+    {
         return $this->hasMany(ExpenditureDetail::class);
     }
 

@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\GenerateUuid;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PaymentCategory extends Model
 {
     use GenerateUuid;
+    use SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;

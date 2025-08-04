@@ -4,10 +4,11 @@ namespace App\Models;
 
 use App\Traits\GenerateUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class IncomeActivity extends Model
 {
-    use GenerateUuid;
+    use GenerateUuid, SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;
@@ -26,15 +27,18 @@ class IncomeActivity extends Model
         'session_id'
     ];
 
-    public function organisation() {
+    public function organisation()
+    {
         return $this->belongsTo(Organisation::class);
     }
 
-    public function paymentItem() {
+    public function paymentItem()
+    {
         return $this->belongsTo(PaymentItem::class);
     }
 
-    public function session() {
+    public function session()
+    {
         return $this->belongsTo(Session::class);
     }
 

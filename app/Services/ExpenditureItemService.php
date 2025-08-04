@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Constants\Constants;
@@ -14,7 +15,8 @@ use App\Models\PaymentItem;
 use App\Models\TransactionHistory;
 use App\Traits\HelpTrait;
 
-class ExpenditureItemService implements ExpenditureItemInterface, TransactionDataGroupMgt {
+class ExpenditureItemService implements ExpenditureItemInterface, TransactionDataGroupMgt
+{
 
     use HelpTrait;
     private SessionService $session_service;
@@ -38,7 +40,6 @@ class ExpenditureItemService implements ExpenditureItemInterface, TransactionDat
             'date'                      => $request->date,
             'expenditure_category_id'   => $expenditure_category->id,
             'scan_picture'              => $request->scan_picture,
-            'updated_by'                => $request->user()->name,
             'payment_item_id'           => $payment_item->id,
             'session_id'                => $current_session->id,
         ]);
@@ -48,16 +49,16 @@ class ExpenditureItemService implements ExpenditureItemInterface, TransactionDat
     {
         $expenditure_item = $this->findExpenditureItem($id, $expenditure_category_id);
 
-        if($expenditure_item->approve == PaymentStatus::PENDING){
+        if ($expenditure_item->approve == PaymentStatus::PENDING) {
             $expenditure_item->update([
                 'name'                      => $request->name,
                 'amount'                    => $request->amount,
                 'venue'                     => $request->venue,
                 'comment'                   => $request->comment,
                 'date'                      => $request->date,
-                'scan_picture'              => $request->scan_picture
+                'scan_picture'              => $request->scan_picture,
             ]);
-        }else {
+        } else {
             throw new BusinessValidationException("Expenditure Item cannot be updated after been approved or declined", 403);
         }
     }
@@ -88,7 +89,7 @@ class ExpenditureItemService implements ExpenditureItemInterface, TransactionDat
     public function approveExpenditureItem($id, $type)
     {
         $expenditure_item = ExpenditureItem::findOrFail($id);
-        if($expenditure_item->approve == PaymentStatus::PENDING){
+        if ($expenditure_item->approve == PaymentStatus::PENDING) {
             $expenditure_item->approve = $type;
             $expenditure_item->save();
         }
@@ -103,10 +104,10 @@ class ExpenditureItemService implements ExpenditureItemInterface, TransactionDat
     {
 
         $data = ExpenditureItem::where('expenditure_category_id', $expenditure_category_id);
-        if($status != Constants::ALL){
+        if ($status != Constants::ALL) {
             $data = $data->where('approve', $status);
         }
-        if(!is_null($session_id)){
+        if (!is_null($session_id)) {
             $data = $data->where('session_id', $session_id);
         }
         return $data->orderBy('name', 'ASC')->get();
@@ -115,7 +116,7 @@ class ExpenditureItemService implements ExpenditureItemInterface, TransactionDat
     private function generateExpenditureItemResponse($items)
     {
         $expenses = [];
-        foreach ($items as $item){
+        foreach ($items as $item) {
             $amount_given = $this->calculateTotalAmountGiven($item->expenditureDetails);
             $amount_spent =  $this->calculateTotalAmountSpent($item->expenditureDetails);
             $balance = $this->calculateExpenditureBalanceByExpenditureItem($amount_given, $amount_spent, $item->amount);
@@ -129,8 +130,7 @@ class ExpenditureItemService implements ExpenditureItemInterface, TransactionDat
     public function calculateTotal($items)
     {
         $total = 0;
-        foreach($items as $item)
-        {
+        foreach ($items as $item) {
             $total += $item->amount;
         }
 
@@ -145,27 +145,32 @@ class ExpenditureItemService implements ExpenditureItemInterface, TransactionDat
     public function getExpenditureByCategory($expenditure_category_id, $request)
     {
         $items = ExpenditureItem::where('expenditure_category_id', $expenditure_category_id)
-                        ->where('session_id', $request->session_id)
-                        ->orderBy('name', 'ASC');
-        if(isset($request->payment_item_id)){
+            ->where('session_id', $request->session_id)
+            ->orderBy('name', 'ASC');
+        if (isset($request->payment_item_id)) {
             $items = $items->where('payment_item_id', $request->payment_item_id);
         }
-        if(isset($request->status)  && $request->status != Constants::ALL) {
+        if (isset($request->status)  && $request->status != Constants::ALL) {
             $items = $items->where('approve', $request->status);
         }
-        if(isset($request->filter)){
-            $items = $items->where('name', 'LIKE', '%'.$request->filter.'%');
+        if (isset($request->filter)) {
+            $items = $items->where('name', 'LIKE', '%' . $request->filter . '%');
         }
         $paginated_data  = $items->paginate($request->per_page);
-        return (new ExpenditureItemCollection($this->generateExpenditureItemResponse($paginated_data), $paginated_data->total(),
-            $paginated_data->lastPage(), (int)$paginated_data->perPage(), $paginated_data->currentPage()));
+        return (new ExpenditureItemCollection(
+            $this->generateExpenditureItemResponse($paginated_data),
+            $paginated_data->total(),
+            $paginated_data->lastPage(),
+            (int)$paginated_data->perPage(),
+            $paginated_data->currentPage()
+        ));
     }
 
     public function getExpenditureItemsByPaymentItem($item, $request)
     {
         $items = ExpenditureItem::where('payment_item_id', $item);
 
-        if(!is_null($request->status) && $request->status != Constants::ALL){
+        if (!is_null($request->status) && $request->status != Constants::ALL) {
             $items = $items->where('approve', $request->status);
         }
         $items = $items->orderBy('name', 'ASC')->get();
@@ -176,26 +181,31 @@ class ExpenditureItemService implements ExpenditureItemInterface, TransactionDat
     {
 
         $items = ExpenditureItem::where('expenditure_category_id', $request->expenditure_category_id);
-        if(isset($request->session_id)){
+        if (isset($request->session_id)) {
             $items = $items->where('session_id', $request->session_id);
         }
-        if(isset($request->payment_item_id)){
+        if (isset($request->payment_item_id)) {
             $items = $items->where('payment_item_id', $request->payment_item_id);
         }
-        if(isset($request->filter)){
-            $items = $items->where('name', 'LIKE', '%'.$request->filter.'%');
+        if (isset($request->filter)) {
+            $items = $items->where('name', 'LIKE', '%' . $request->filter . '%');
         }
         $items = $items->orderBy('name', 'ASC');
 
-        $expenditure_items  =isset($request->per_page)? $items->paginate($request->per_page) : $items->get();
+        $expenditure_items  = isset($request->per_page) ? $items->paginate($request->per_page) : $items->get();
 
         $total = isset($request->per_page) ? $expenditure_items->total() : count($expenditure_items);
-        $last_page = isset($request->per_page) ? $expenditure_items->lastPage(): 0;
+        $last_page = isset($request->per_page) ? $expenditure_items->lastPage() : 0;
         $per_page = isset($request->per_page) ? (int)$expenditure_items->perPage() : 0;
         $current_page = isset($request->per_page) ? $expenditure_items->currentPage() : 0;
 
-        return new ExpenditureItemCollection($this->generateExpenditureItemResponse($expenditure_items), $total, $last_page,
-            $per_page, $current_page);
+        return new ExpenditureItemCollection(
+            $this->generateExpenditureItemResponse($expenditure_items),
+            $total,
+            $last_page,
+            $per_page,
+            $current_page
+        );
     }
 
     public function downloadExpenditureItems($request)
@@ -203,20 +213,22 @@ class ExpenditureItemService implements ExpenditureItemInterface, TransactionDat
         return $this->filterExpenditureItems($request);
     }
 
-    public function getExpensesByCategoryAndQuarter($category_id, $start_quarter, $end_quarter){
-       return ExpenditureItem::where('expenditure_category_id', $category_id)
-                       ->where('approve', PaymentStatus::APPROVED)
-                       ->whereBetween('created_at', [$start_quarter, $end_quarter])
-                       ->orderBy('name')
-                       ->get();
+    public function getExpensesByCategoryAndQuarter($category_id, $start_quarter, $end_quarter)
+    {
+        return ExpenditureItem::where('expenditure_category_id', $category_id)
+            ->where('approve', PaymentStatus::APPROVED)
+            ->whereBetween('created_at', [$start_quarter, $end_quarter])
+            ->orderBy('name')
+            ->get();
     }
 
-    public function getExpensesByCategoryAndYear($category_id, $year){
+    public function getExpensesByCategoryAndYear($category_id, $year)
+    {
         return ExpenditureItem::where('expenditure_category_id', $category_id)
-                        ->where('approve', PaymentStatus::APPROVED)
-                        ->where('session_id', $year)
-                        ->orderBy('name')
-                        ->get();
+            ->where('approve', PaymentStatus::APPROVED)
+            ->where('session_id', $year)
+            ->orderBy('name')
+            ->get();
     }
 
 

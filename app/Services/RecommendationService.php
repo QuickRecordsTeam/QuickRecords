@@ -27,7 +27,6 @@ class RecommendationService implements RecommendationInterface
         $response = $this->getRecommendationFromOpenAI($data);
 
         return $this->formatRecommendationResponse(json_decode($response->body(), true)['choices'][0]['message']['content']);
-
     }
 
     private function formatRecommendationResponse($msg)
@@ -90,12 +89,11 @@ class RecommendationService implements RecommendationInterface
     {
         $membersContributions = array();
 
-        foreach ($members_contributions as $contribution){
+        foreach ($members_contributions as $contribution) {
 
             $membersContributions[] = ["name" => $contribution['user_name'], "total amount contributed" => $contribution['total_amount_deposited'], "total balance" => $contribution['balance']];
         }
 
         return $membersContributions;
-
     }
 }

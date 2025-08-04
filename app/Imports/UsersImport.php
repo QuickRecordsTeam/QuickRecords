@@ -56,7 +56,6 @@ class UsersImport implements ToModel, WithStartRow, WithCustomCsvSettings
                 'address'         => $row[4],
                 'occupation'      => $row[5],
                 'organisation_id' => $this->organisation_id,
-                'updated_by'      => $this->updated_by,
                 'password'        => "",
                 'status'          => SessionStatus::ACTIVE
             ]);
@@ -70,7 +69,6 @@ class UsersImport implements ToModel, WithStartRow, WithCustomCsvSettings
             'role_id'       => $role,
             'model_id'      => $user_id,
             'model_type'    => 'App\Models\User',
-            'updated_by'    => $updated_by
         ]);
     }
 }

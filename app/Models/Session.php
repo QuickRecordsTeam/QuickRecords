@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\GenerateUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @method static where(string $string, string $ACTIVE)
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 class Session extends Model
 {
     use GenerateUuid;
+    use SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;

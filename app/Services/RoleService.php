@@ -11,6 +11,8 @@ use App\Traits\HelpTrait;
 use App\Traits\ResponseTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
 
 class RoleService implements RoleInterface
 {
@@ -24,7 +26,7 @@ class RoleService implements RoleInterface
         $member_has_role = $this->checkIfRoleCanBeAdded($assignRole);
 
         if (!$member_has_role) {
-            $this->saveUserRole($user, $assignRole, $updated_by);
+            $this->saveUserRole($user, $assignRole, auth::user()->id);
         } else {
             throw new BusinessValidationException("Only one member of your organisation can have this role", 403);
         }

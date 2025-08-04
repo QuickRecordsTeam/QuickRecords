@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\GenerateUuid;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @method static create(array $array)
@@ -11,6 +12,7 @@ use App\Traits\GenerateUuid;
 class UserContribution extends Model
 {
     use GenerateUuid;
+    use SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;
@@ -53,5 +55,4 @@ class UserContribution extends Model
     {
         return $this->hasOne(TransactionHistory::class, "reference_data");
     }
-
 }

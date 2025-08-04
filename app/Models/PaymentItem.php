@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\GenerateUuid;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @method static find(mixed $payment_item_id)
@@ -12,6 +13,7 @@ use App\Traits\GenerateUuid;
 class PaymentItem extends Model
 {
     use GenerateUuid;
+    use SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;
@@ -35,19 +37,23 @@ class PaymentItem extends Model
         'end_amount'
     ];
 
-    public function paymentCategory(){
+    public function paymentCategory()
+    {
         return $this->belongsTo(PaymentCategory::class);
     }
 
-    public function userContribution() {
+    public function userContribution()
+    {
         return $this->hasMany(UserContribution::class);
     }
 
-    public function activitySupports() {
+    public function activitySupports()
+    {
         return $this->hasMany(ActivitySupport::class);
     }
 
-    public function incomeActivities() {
+    public function incomeActivities()
+    {
         return $this->hasMany(IncomeActivity::class);
     }
 
@@ -56,7 +62,8 @@ class PaymentItem extends Model
         return $this->hasMany(ExpenditureItem::class);
     }
 
-    public function session() {
+    public function session()
+    {
         return $this->belongsTo(Session::class);
     }
 }

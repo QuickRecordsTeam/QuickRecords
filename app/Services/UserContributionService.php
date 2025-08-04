@@ -569,7 +569,6 @@ class UserContributionService implements UserContributionInterface, TransactionD
                 'payment_item_id'   => $payment_item->id,
                 'status'            => $status,
                 'scan_picture'      => null,
-                'updated_by'        => $auth_user,
                 'balance'           => $validAmount ? 0 : $balance_contribution,
                 'session_id'        => $current_session,
                 'quarterly_name'    => !is_null($request->quarterly_name) ? ($request->quarterly_name) : "",
@@ -744,7 +743,6 @@ class UserContributionService implements UserContributionInterface, TransactionD
             MemberRegistration::create([
                 'user_id'           => $user->id,
                 'session_id'        => $request->year,
-                'updated_by'        => $auth_user,
                 'month_name'        => $request->month_name,
                 'registration_id'   => $registration_fee->id
             ]);

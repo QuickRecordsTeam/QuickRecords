@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\GenerateUuid;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @method static where(string $string, $user_id)
@@ -12,6 +13,7 @@ use App\Traits\GenerateUuid;
 class UserSaving extends Model
 {
     use GenerateUuid;
+    use SoftDeletes;
 
     protected $primaryKey = 'id';
     public $incrementing  = false;
@@ -31,11 +33,13 @@ class UserSaving extends Model
     ];
 
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function session() {
+    public function session()
+    {
         return $this->hasMany(Session::class);
     }
 
@@ -43,5 +47,4 @@ class UserSaving extends Model
     {
         return $this->hasOne(TransactionHistory::class, "reference_data");
     }
-
 }
