@@ -536,37 +536,37 @@ trait HelpTrait
 
     public function computeTotalExpectedPaymentItemAmount($payment_item)
     {
-
+        $payment_amount = $payment_item->is_range ? $payment_item->start_amount : $payment_item->amount;
         $member_size = 1;
         switch ($payment_item->frequency) {
             case PaymentItemFrequency::ONE_TIME:
             case PaymentItemFrequency::YEARLY:
                 switch ($payment_item->type) {
                     case PaymentItemType::A_MEMBER:
-                        $amount = $payment_item->is_range ? $payment_item->start_amount : $payment_item->amount;
+                        $amount = $payment_amount;
                         break;
                     case PaymentItemType::ALL_MEMBERS:
                         $member_size = User::all()->count();
-                        $payment_amount = $payment_item->is_range ? $payment_item->start_amount : $payment_item->amount;
+
                         $amount = $member_size * $payment_amount;
                         break;
                     case PaymentItemType::GROUPED_MEMBERS:
                         $member_size = count(array_filter(explode("/", $payment_item->reference)));
-                        $payment_amount = $payment_item->is_range ? $payment_item->start_amount : $payment_item->amount;
+
                         $amount = $member_size * $payment_amount;
                         break;
                     case PaymentItemType::MEMBERS_WITH_ROLES:
                         $member_size = count(array_filter(explode("/", $this->getAllAdminsId())));
-                        $payment_amount = $payment_item->is_range ? $payment_item->start_amount : $payment_item->amount;
+
                         $amount = $member_size * $payment_amount;
                         break;
                     case PaymentItemType::MEMBERS_WITHOUT_ROLES:
                         $member_size = count(array_filter(explode("/", $this->getAllNoAdminsId())));
-                        $payment_amount = $payment_item->is_range ? $payment_item->start_amount : $payment_item->amount;
+
                         $amount = $member_size * $payment_amount;
                         break;
                     default:
-                        $amount = $payment_item->is_range ? $payment_item->start_amount : $payment_item->amount;
+                        $amount = $payment_amount;
                 }
                 break;
             case PaymentItemFrequency::QUARTERLY:
