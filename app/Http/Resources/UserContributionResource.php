@@ -13,8 +13,10 @@ class UserContributionResource extends JsonResource
     use HelpTrait;
     public function toArray($request)
     {
-        $payment_item = PaymentItem::find($this->payment_item_id);
-        $user = User::find($this->user_id);
+        $payment_item = $this->paymentItem;
+        $user = $this->user;
+
+
         return [
             'id'                       => $this->id,
             'code'                     => $this->code,
@@ -34,14 +36,30 @@ class UserContributionResource extends JsonResource
             'payment_item_created_at'  => $payment_item->created_at,
             'payment_category'         => $payment_item->paymentCategory,
             'payment_item_compulsory'  => $payment_item->compulsory == 0 ? false : true,
-            'balance'                  => $this->total_amount_deposited == null ? $this->balance : ($this->computeTotalPaymentItemAmount($payment_item) - $this->total_amount_deposited),
+            'balance'                  => $this->getBalance($payment_item, $this->total_amount_deposited, $this->balance),
             'updated_by'               => $this->updated_by,
             'created_at'               => $this->created_at,
             'total_amount_deposited'   => $this->total_amount_deposited == null ? 0 : $this->total_amount_deposited,
             'session_id'               => $this->session_id,
             'quarterly_name'           => $this->quarterly_name,
             'month_name'               => $this->month_name,
-            'userContribution'         => $this->userContribution
+            'userContribution'         => $this->userContribution,
+            'is_range'                 => $payment_item->is_range,
+            'start_amount'             => $payment_item->start_amount,
+            'end_amount'               => $payment_item->end_amount
         ];
+    }
+
+    private function getBalance($payment_item, $total_amount_deposited, $balance)
+    {
+        if ($total_amount_deposited !== null) {
+            if ($payment_item->is_range && $total_amount_deposited > $payment_item->start_amount) {
+                return 0;
+            } else {
+                return ($this->computeTotalPaymentItemAmount($payment_item) - $total_amount_deposited);
+            }
+        } else {
+            return $balance;
+        }
     }
 }

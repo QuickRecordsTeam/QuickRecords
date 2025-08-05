@@ -602,9 +602,9 @@ trait HelpTrait
         return [$amount, $member_size];
     }
 
-    public function computeTotalBalanceByPaymentItem($payment_item, $total_amount_contributed)
+    public function computeTotalBalanceByPaymentItem($total_amount_payable, $payment_item, $total_amount_contributed)
     {
-        return $this->computeTotalExpectedPaymentItemAmount($payment_item)[0] - $total_amount_contributed;
+        return $total_amount_contributed >= $total_amount_payable ? 0 : $this->computeTotalExpectedPaymentItemAmount($payment_item)[0] - $total_amount_contributed;
     }
 
     public function computeExpectedAmountByMemberAndPaymentItem($payment_item, $member)
@@ -667,7 +667,7 @@ trait HelpTrait
 
     public function computePercentageContributed($total_amount_contributed, $expected_amount)
     {
-        return ($total_amount_contributed / $expected_amount) * 100;
+        return $total_amount_contributed >= $expected_amount ? 100.00 : ($total_amount_contributed / $expected_amount) * 100;
     }
 
     public function computeTotalAmountByUser($array)

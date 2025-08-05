@@ -18,9 +18,26 @@ class BalanceSheetColumns extends JsonResource
     private $total_expected_amount;
     private $member_size;
     private $total_amount_deposited;
-    public function __construct($resource, $code, $name, $id, $amount, $compulsory, $type, $frequency,
-                                $payment_durations, $total_expected_amount, $member_size,$total_amount_deposited)
-    {
+    private $is_range;
+    private $start_amount;
+    private $end_amount;
+    public function __construct(
+        $resource,
+        $code,
+        $name,
+        $id,
+        $amount,
+        $compulsory,
+        $type,
+        $frequency,
+        $payment_durations,
+        $total_expected_amount,
+        $member_size,
+        $total_amount_deposited,
+        $is_range,
+        $start_amount,
+        $end_amount
+    ) {
         parent::__construct($resource);
         $this->code = $code;
         $this->name = $name;
@@ -33,6 +50,9 @@ class BalanceSheetColumns extends JsonResource
         $this->total_expected_amount = $total_expected_amount;
         $this->member_size = $member_size;
         $this->total_amount_deposited = $total_amount_deposited;
+        $this->is_range = $is_range;
+        $this->start_amount = $start_amount;
+        $this->end_amount = $end_amount;
     }
 
     /**
@@ -54,7 +74,10 @@ class BalanceSheetColumns extends JsonResource
             'total_expect_amount' => $this->total_expected_amount,
             'member_size' => $this->member_size,
             'payment_durations' => $this->payment_durations,
-            'total_amount_deposited' => $this->total_amount_deposited
+            'total_amount_deposited' => $this->total_amount_deposited,
+            'is_range'       => $this->is_range,
+            'start_amount' => $this->start_amount,
+            'end_amount' => $this->end_amount
         ];
     }
 }

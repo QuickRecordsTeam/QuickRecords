@@ -58,6 +58,7 @@ class PaymentItemService implements PaymentItemInterface
             'frequency'     => $request->frequency,
             'reference'     => $this->setPaymentItemReference($request->reference, $request->type),
             'deadline'      => $request->deadline,
+            'is_range'      => isset($updated->amount) ? $request->is_range : false,
             'start_amount'   => $request->start_amount,
             'end_amount'     => $request->end_amount
         ]);
@@ -184,7 +185,6 @@ class PaymentItemService implements PaymentItemInterface
 
     public function getPaymentActivitiesByCategoryAndSessionAndQuarter($category, $current_year, $start_quarter, $end_quarter)
     {
-
         return PaymentItem::where('payment_category_id', $category)
             ->where('session_id', $current_year->id)
             ->whereBetween('created_at', [$start_quarter, $end_quarter])
