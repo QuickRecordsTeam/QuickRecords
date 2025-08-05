@@ -134,8 +134,9 @@ class UserContributionService implements UserContributionInterface, TransactionD
         }
         $total_contribution = collect($contributions->get())->sum('amount_deposited');
         $total_amount_payable = $this->getTotalPaymentItemAmountByQuarters($payment_item);
-        $total_balance = ($total_amount_payable - $total_contribution);
-        $percentage = $this->computePercentageContributed($total_contribution, $total_amount_payable);
+        $total_balance = $payment_item->is_range && $total_contribution >= $total_amount_payable ? 0 : ($total_amount_payable - $total_contribution);
+        $amountForCalPercentage = $payment_item->is_range && $total_contribution >= $total_amount_payable ? $payment_item->start_amount : $total_contribution;
+        $percentage = $this->computePercentageContributed($amountForCalPercentage, $total_amount_payable);
 
         if ($payment_item->frequency == PaymentItemFrequency::MONTHLY) {
             $unpaid_durations = $this->getMemberUnPayMonths($payment_item->frequency, $payment_item->created_at, $contributions->get());
@@ -210,11 +211,12 @@ class UserContributionService implements UserContributionInterface, TransactionD
         // } else {
         $contributions = $contributions->selectRaw('SUM(user_contributions.amount_deposited) as total_amount_deposited, user_contributions.*')
             ->groupBy('user_id')->orderBy('user_contributions.created_at', 'DESC');
+
         $total_contribution = $this->computeTotalOrganisationContribution($contributions);
         $expectedData = $this->computeTotalExpectedPaymentItemAmount($payment_item);
         $total_amount_payable = $expectedData[0];
         $member_size = $expectedData[1];
-        $total_balance = $this->computeTotalBalanceByPaymentItem($payment_item, $total_contribution);
+        $total_balance = $this->computeTotalBalanceByPaymentItem($total_amount_payable, $payment_item, $total_contribution);
         $percentage = $this->computePercentageContributed($total_contribution, $total_amount_payable);
 
         if ($payment_item->frequency == PaymentItemFrequency::QUARTERLY) {
@@ -543,7 +545,7 @@ class UserContributionService implements UserContributionInterface, TransactionD
 
     private function getUserContributionStatus($payment_item_amount, $total_amount_contributed)
     {
-        return  $total_amount_contributed == $payment_item_amount ? PaymentStatus::COMPLETE : PaymentStatus::INCOMPLETE;
+        return  $total_amount_contributed >= $payment_item_amount ? PaymentStatus::COMPLETE : PaymentStatus::INCOMPLETE;
     }
 
     private function findUserContributionById($id)
@@ -600,8 +602,6 @@ class UserContributionService implements UserContributionInterface, TransactionD
 
         $total_amount_contributed +=  $request->amount_deposited;
 
-        $validAmount = $this->validateAmountDeposited($payment_item_amount, $total_amount_contributed);
-
         $status = $this->getUserContributionStatus($payment_item_amount, $total_amount_contributed);
 
         $user_last_contribution = $this->getUserLastContributionByPaymentItem($user_id, $request->payment_item_id, $request->month_name, $request->quarterly_name, $payment_item->frequency);
@@ -617,7 +617,7 @@ class UserContributionService implements UserContributionInterface, TransactionD
             'status'            => $status,
             'scan_picture'      => null,
             'updated_by'        => $auth_user,
-            'balance'           => $validAmount ? 0 : $balance_contribution,
+            'balance'           => $status ? 0 : $balance_contribution,
             'session_id'        => $current_session,
             'quarterly_name'    => !is_null($request->quarterly_name) ? ($request->quarterly_name) : "",
             'month_name'        => $request->month_name,
@@ -1190,7 +1190,7 @@ class UserContributionService implements UserContributionInterface, TransactionD
 
         $member_size = $expectedData[1];
 
-        $total_balance = $this->computeTotalBalanceByPaymentItem($payment_item, $total_contribution);
+        $total_balance = $this->computeTotalBalanceByPaymentItem($total_amount_payable, $payment_item, $total_contribution);
 
         $percentage = $this->computePercentageContributed($total_contribution, $total_amount_payable);
 
