@@ -108,6 +108,7 @@ class BalanceSheetService implements BalanceSheetInterface
 
                 $amount_per_item = $this->userContributionService->getApprovedContributionByUserAndPaymentItem($payment_item->id, $member->id)->sum('user_contributions.amount_deposited');
                 $payment_amount = $payment_item->is_range ? $payment_item->start_amount : $payment_item->amount;
+
                 $memberPayments[] = new MemberPaymentItemContributionResource(
                     $payment_item,
                     $payment_item->id,
@@ -143,6 +144,7 @@ class BalanceSheetService implements BalanceSheetInterface
             $membersYearlyPayments[] =  (new MemberYearlyPaymentResource($member, $memberPayments, $total_member_year_contribution, $total_member_year_balance, new MemberInfoResource($member, $member->id, $member->name, $member->email), $perMemberExpectedAmount));
         }
         $column_names = $this->getColumnNameForBalanceSheet($membersYearlyPayments);
+
 
         return new BalanceSheetResource(
             null,
@@ -204,7 +206,10 @@ class BalanceSheetService implements BalanceSheetInterface
                 $payment_item->payment_durations,
                 $expected_data[0],
                 $expected_data[1],
-                $total
+                $total,
+                $payment_item->is_range,
+                $payment_item->start_amount,
+                $payment_item->end_amount
             );
         }
 
