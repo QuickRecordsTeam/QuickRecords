@@ -58,6 +58,7 @@ class PaymentItemService implements PaymentItemInterface
             'frequency'     => $request->frequency,
             'reference'     => $this->setPaymentItemReference($request->reference, $request->type),
             'deadline'      => $request->deadline,
+            'is_range'      => isset($updated->amount) ? $request->is_range : false,
             'start_amount'   => $request->start_amount,
             'end_amount'     => $request->end_amount
         ]);
