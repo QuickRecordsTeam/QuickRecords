@@ -185,7 +185,6 @@ class PaymentItemService implements PaymentItemInterface
 
     public function getPaymentActivitiesByCategoryAndSessionAndQuarter($category, $current_year, $start_quarter, $end_quarter)
     {
-
         return PaymentItem::where('payment_category_id', $category)
             ->where('session_id', $current_year->id)
             ->whereBetween('created_at', [$start_quarter, $end_quarter])
