@@ -216,7 +216,7 @@ class UserContributionService implements UserContributionInterface, TransactionD
         $expectedData = $this->computeTotalExpectedPaymentItemAmount($payment_item);
         $total_amount_payable = $expectedData[0];
         $member_size = $expectedData[1];
-        $total_balance = $this->computeTotalBalanceByPaymentItem($payment_item, $total_contribution);
+        $total_balance = $this->computeTotalBalanceByPaymentItem($total_amount_payable, $payment_item, $total_contribution);
         $percentage = $this->computePercentageContributed($total_contribution, $total_amount_payable);
 
         if ($payment_item->frequency == PaymentItemFrequency::QUARTERLY) {
@@ -1190,7 +1190,7 @@ class UserContributionService implements UserContributionInterface, TransactionD
 
         $member_size = $expectedData[1];
 
-        $total_balance = $this->computeTotalBalanceByPaymentItem($payment_item, $total_contribution);
+        $total_balance = $this->computeTotalBalanceByPaymentItem($total_amount_payable, $payment_item, $total_contribution);
 
         $percentage = $this->computePercentageContributed($total_contribution, $total_amount_payable);
 
