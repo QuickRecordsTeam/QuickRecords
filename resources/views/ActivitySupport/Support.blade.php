@@ -2,29 +2,29 @@
 @section('title', 'Sponsorships')
 @section('section')
     <div style="margin-bottom:30px;">
-        {{-- <div class="column_100" style="margin-left: 30px">
-        <div class="column_25">
-            <img src="{{public_path('cyf_logo.png')}}" alt="pcc logo" width="100px;" height="100px;"
-                style="border-radius: 2px">
-        </div>
-        <div class="column_50" style="text-align: center;">
-            <label for="organisation" style="font-weight: bold; text-transform: uppercase; font-size: small;">
-                CHRISTIAN YOUTH FELLOWSHIP (C.Y.F)</label><br />
-            <label for="organisation" style="font-weight: bold; text-transform: uppercase; font-size: small;">
-                FAKO NORTH PRESBYTERY</label><br />
-            <label for="organisation" style="font-weight: bold; text-transform: uppercase; font-size: small;">
-                BUEA ZONE</label><br />
-            <label for="organisation" style="font-weight: bold; text-transform: uppercase; font-size: small;">
-                CHRISTIAN YOUTH FELLOWSHIP - GREAT SOPPO </label><br />
-            <label for="organisation" style="font-weight: bold; text-transform: uppercase; font-size: small;">
-                {{ $organisation->name }} - {{ $organisation->address }}</label><br />
-        </div>
-        <div class="column_25">
-            <img src="{{public_path($organisation_logo)}}" alt="organisation logo" width="100px;" height="100px;"
-                style="border-radius: 2px">
-        </div>
-    </div> --}}
         <div class="column_100" style="margin-left: 30px">
+            <div class="column_25">
+                <img src="{{ public_path('cyf_logo.png') }}" alt="pcc logo" width="100px;" height="100px;"
+                    style="border-radius: 2px">
+            </div>
+            <div class="column_50" style="text-align: center;">
+                <label for="organisation" style="font-weight: bold; text-transform: uppercase; font-size: small;">
+                    CHRISTIAN YOUTH FELLOWSHIP (C.Y.F)</label><br />
+                <label for="organisation" style="font-weight: bold; text-transform: uppercase; font-size: small;">
+                    FAKO NORTH PRESBYTERY</label><br />
+                <label for="organisation" style="font-weight: bold; text-transform: uppercase; font-size: small;">
+                    BUEA ZONE</label><br />
+                <label for="organisation" style="font-weight: bold; text-transform: uppercase; font-size: small;">
+                    CHRISTIAN YOUTH FELLOWSHIP - GREAT SOPPO </label><br />
+                <label for="organisation" style="font-weight: bold; text-transform: uppercase; font-size: small;">
+                    {{ $organisation->name }} - {{ $organisation->address }}</label><br />
+            </div>
+            <div class="column_25">
+                <img src="{{ public_path($organisation_logo) }}" alt="organisation logo" width="100px;" height="100px;"
+                    style="border-radius: 2px">
+            </div>
+        </div>
+        {{-- <div class="column_100" style="margin-left: 30px">
             <div class="column_25">
                 <img src="{{ public_path($organisation_logo) }}" alt="organisation logo" width="100px;" height="100px;"
                     style="border-radius: 2px">
@@ -37,7 +37,7 @@
                 <img src="{{ public_path($organisation_logo) }}" alt="organisation logo" width="100px;" height="100px;"
                     style="border-radius: 2px">
             </div>
-        </div>
+        </div> --}}
         <div class="column_100" style="margin-left: 30px;margin-top: 20px">
             <div class="column_10">
             </div>
