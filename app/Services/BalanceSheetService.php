@@ -108,14 +108,14 @@ class BalanceSheetService implements BalanceSheetInterface
 
                 $amount_per_item = $this->userContributionService->getApprovedContributionByUserAndPaymentItem($payment_item->id, $member->id)->sum('user_contributions.amount_deposited');
                 $payment_amount = $payment_item->is_range ? $payment_item->start_amount : $payment_item->amount;
-                $bal = $payment_amount >= $amount_per_item ? 0 : ($payment_amount - $amount_per_item);
+
                 $memberPayments[] = new MemberPaymentItemContributionResource(
                     $payment_item,
                     $payment_item->id,
                     $payment_item->name,
                     $amount_per_item,
                     $payment_amount,
-                    $bal,
+                    ($payment_amount - $amount_per_item),
                     $payment_item->paymentCategory->code . '.' . $k,
                     $payment_item->compulsory,
                     $payment_item->type,
@@ -135,7 +135,7 @@ class BalanceSheetService implements BalanceSheetInterface
             $perMemberExpectedAmount = $this->computeTotalExpectedAmountByMember($payment_items, $registration, $member);
 
 
-            $total_member_year_balance = $perMemberExpectedAmount - $total_member_year_contribution;
+            $total_member_year_balance = $total_member_year_contribution >= $perMemberExpectedAmount ? 0 : $perMemberExpectedAmount - $total_member_year_contribution;
 
             $total_year_balance += $total_member_year_balance;
 
