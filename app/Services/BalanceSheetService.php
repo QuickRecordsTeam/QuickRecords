@@ -135,7 +135,7 @@ class BalanceSheetService implements BalanceSheetInterface
             $perMemberExpectedAmount = $this->computeTotalExpectedAmountByMember($payment_items, $registration, $member);
 
 
-            $total_member_year_balance = $perMemberExpectedAmount - $total_member_year_contribution;
+            $total_member_year_balance = $total_member_year_contribution >= $perMemberExpectedAmount ? 0 : $perMemberExpectedAmount - $total_member_year_contribution;
 
             $total_year_balance += $total_member_year_balance;
 
