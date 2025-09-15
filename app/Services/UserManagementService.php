@@ -376,7 +376,7 @@ class UserManagementService implements UserManagementInterface
                 'expire_at' => Carbon::now()->addMinutes(10)
             ]);
         } catch (Exception $exception) {
-            throw new EmailException("Could not send reset email link", 550);
+            throw new Exception($exception->getMessage());
         }
     }
 

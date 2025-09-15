@@ -24,10 +24,32 @@ class MemberContributedItemResource extends JsonResource
     private $comment;
     private $is_compulsory;
     private $date;
-    public function __construct($id, $payment_item_id, $payment_item_amount, $name, $amount_deposited,
-                                $balance, $status, $approve, $created_at, $year, $frequency, $month_name, $quarterly_name,
-                                $created_by, $code, $comment, $is_compulsory, $date)
-    {
+    private $is_range;
+    private $start_amount;
+    private $end_amount;
+    public function __construct(
+        $id,
+        $payment_item_id,
+        $payment_item_amount,
+        $name,
+        $amount_deposited,
+        $balance,
+        $status,
+        $approve,
+        $created_at,
+        $year,
+        $frequency,
+        $month_name,
+        $quarterly_name,
+        $created_by,
+        $code,
+        $comment,
+        $is_compulsory,
+        $date,
+        $is_range,
+        $start_amount,
+        $end_amount
+    ) {
         parent::__construct(null);
         $this->id = $id;
         $this->payment_item_id = $payment_item_id;
@@ -47,6 +69,9 @@ class MemberContributedItemResource extends JsonResource
         $this->comment = $comment;
         $this->is_compulsory = $is_compulsory;
         $this->date = $date;
+        $this->is_range = $is_range;
+        $this->start_amount = $start_amount;
+        $this->end_amount = $end_amount;
     }
 
     public function toArray($request)
@@ -69,7 +94,10 @@ class MemberContributedItemResource extends JsonResource
             'code'             => $this->code,
             'comment'          => $this->comment,
             'is_compulsory'    => $this->is_compulsory,
-            'date'             => $this->date
+            'date'             => $this->date,
+            'is_range'         => $this->is_range,
+            'start_amount'     => $this->start_amount,
+            'end_amount'       => $this->end_amount
         ];
     }
 }
