@@ -339,7 +339,7 @@ class UserContributionController extends Controller
     private function computeTotal($contributions, $type)
     {
         return collect($contributions)->map(function ($contribution) use ($type) {
-            return $type == "DEBTS" ? $contribution->item_amount : $contribution->payment_item_amount;
+            return $type == "DEBTS" ? $contribution->item_amount : $contribution->amount;
         })->sum();
     }
 }

@@ -392,14 +392,17 @@ class UserContributionService implements UserContributionInterface, TransactionD
                 $contribution->created_at,
                 $contribution->year,
                 $contribution->frequency,
-
                 $contribution->month_name,
                 $contribution->quarterly_name,
                 $contribution->updated_by,
                 $contribution->code,
                 $contribution->comment,
                 $contribution->compulsory,
-                $contribution->date
+                $contribution->date,
+                $contribution->is_range,
+                $contribution->start_amount,
+                $contribution->end_amount
+
             );
 
             $paid_debts[] = $contributedItem;
@@ -499,7 +502,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                             'REGISTRATION',
                             $session_resource,
                             null,
-                            null
+                            null,
+                            false,
+                            0,
+                            0
                         );
                     }
                 }
@@ -524,7 +530,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                             'REGISTRATION',
                             null,
                             $month,
-                            null
+                            null,
+                            false,
+                            0,
+                            0
                         );
                     }
                 }
@@ -819,7 +828,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                 'payment_items.payment_category_id',
                 'payment_items.updated_at',
                 'user_contributions.*',
-                'sessions.year'
+                'sessions.year',
+                'payment_items.is_range',
+                'payment_items.start_amount',
+                'payment_items.end_amount'
             )
             ->orderBy('user_contributions.created_at', 'DESC')->get()->toArray();
     }
@@ -854,7 +866,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                 null,
                 "",
                 $value->is_compulsory,
-                $value->created_at
+                $value->created_at,
+                false,
+                0,
+                0
             );
         }
         return $registrations;
@@ -964,7 +979,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                 "CONTRIBUTION",
                 $current_session,
                 null,
-                null
+                null,
+                $item->is_range,
+                $item->start_amount,
+                $item->end_amount
             );
             array_push($debts, $to_be_paid);
         }
@@ -981,7 +999,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                 "CONTRIBUTION",
                 $current_session,
                 null,
-                null
+                null,
+                $item->is_range,
+                $item->start_amount,
+                $item->end_amount
             );
             array_push($debts, $to_be_paid);
         }
@@ -1006,7 +1027,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                     "CONTRIBUTION",
                     $current_session,
                     null,
-                    $quarter
+                    $quarter,
+                    $item->is_range,
+                    $item->start_amount,
+                    $item->end_amount
                 );
                 $debts[] = $to_be_paid;
             }
@@ -1023,7 +1047,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                     "CONTRIBUTION",
                     $current_session,
                     null,
-                    $quarter
+                    $quarter,
+                    $item->is_range,
+                    $item->start_amount,
+                    $item->end_amount
                 );
                 $debts[] = $to_be_paid;
             }
@@ -1048,7 +1075,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                     "CONTRIBUTION",
                     $current_session,
                     $month,
-                    null
+                    null,
+                    $item->is_range,
+                    $item->start_amount,
+                    $item->end_amount
                 );
                 $debts[] = $to_be_paid;
             }
@@ -1065,7 +1095,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                     "CONTRIBUTION",
                     $current_session,
                     $month,
-                    null
+                    null,
+                    $item->is_range,
+                    $item->start_amount,
+                    $item->end_amount
                 );
                 $debts[] = $to_be_paid;
             }
@@ -1097,7 +1130,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                 "CONTRIBUTION",
                 $current_session,
                 null,
-                null
+                null,
+                $item->is_range,
+                $item->start_amount,
+                $item->end_amount
             );
             $debts[] = $to_be_paid;
         }
@@ -1114,7 +1150,10 @@ class UserContributionService implements UserContributionInterface, TransactionD
                 "CONTRIBUTION",
                 $current_session,
                 null,
-                null
+                null,
+                $item->is_range,
+                $item->start_amount,
+                $item->end_amount
             );
             $debts[] = $to_be_paid;
         }

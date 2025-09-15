@@ -2,9 +2,9 @@
 @section('title', 'Member Paid Items')
 @section('section')
     <div style="margin-bottom:30px;">
-        <div class="column_100" style="margin-left: 30px">
+        {{-- <div class="column_100" style="margin-left: 30px">
             <div class="column_25">
-                <img src="{{ public_path('cyf_logo.png') }}" alt="pcc logo" width="100px;" height="100px;"
+                <img src="{{ public_path($organisation_logo) }}" alt="organisation logo" width="100px;" height="100px;"
                     style="border-radius: 2px">
             </div>
             <div class="column_50" style="text-align: center;">
@@ -23,8 +23,8 @@
                 <img src="{{ public_path($organisation_logo) }}" alt="organisation logo" width="100px;" height="100px;"
                     style="border-radius: 2px">
             </div>
-        </div>
-        {{-- <div class="column_100" style="margin-left: 30px">
+        </div> --}}
+        <div class="column_100" style="margin-left: 30px">
             <div class="column_25">
                 <img src="{{ public_path($organisation_logo) }}" alt="organisation logo" width="100px;" height="100px;"
                     style="border-radius: 2px">
@@ -37,7 +37,7 @@
                 <img src="{{ public_path($organisation_logo) }}" alt="organisation logo" width="100px;" height="100px;"
                     style="border-radius: 2px">
             </div>
-        </div> --}}
+        </div>
         <div class="column_100" style="margin-left: 30px;margin-top: 20px">
             <div class="column_10">
             </div>
@@ -84,7 +84,7 @@
                 <th style="padding: 12px; border: 1px solid black;">Title</th>
                 <th style="padding: 12px; border: 1px solid black;">Amount Paid(XAF)</th>
                 <th style="padding: 12px; border: 1px solid black;">Balance(XAF)</th>
-                <th style="padding: 12px; border: 1px solid black;">Payment Status</th>
+                <th style="padding: 12px; border: 1px solid black;">Payment Date</th>
                 <th style="padding: 12px; border: 1px solid black;">Transaction Status</th>
                 <th style="padding: 12px; border: 1px solid black;">Frequency</th>
             </tr>
@@ -93,11 +93,11 @@
                     <td style="padding: 3px;">{{ $key + 1 }}</td>
                     <td style="border: 1px solid black; padding: 3px; text-align: center">{{ $contribution->name }}</td>
                     <td style="border: 1px solid black; padding: 3px; text-align: center">
-                        {{ number_format($contribution->payment_item_amount) }}</td>
+                        {{ number_format($contribution->amount) }}</td>
                     <td style="border: 1px solid black; padding: 3px; text-align: center">
                         {{ number_format($contribution->balance) }}</td>
                     <td style="border: 1px solid black; padding: 3px; text-align: center">
-                        {{ $contribution->approve }}</td>
+                        {{ date('d-m-Y', strtotime($contribution->created_at)) }}</td>
                     <td style="border: 1px solid black; padding: 3px; text-align: center">
                         {{ $contribution->payment_status }}</td>
                     <td style="border: 1px solid black; padding: 3px; text-align: center">
@@ -113,7 +113,7 @@
                 <td style="border: 1px solid black; padding: 3px; text-align: center" colspan="2">
                     <b>Total</b>
                 </td>
-                <td style="border: 1px solid black; padding: 3px; text-align: center" colspan="5">
+                <td style="border: 1px solid black; padding: 3px; text-align: center" colspan="1">
                     <b>{{ number_format($total) }} XAF</b>
                 </td>
             </tr>
