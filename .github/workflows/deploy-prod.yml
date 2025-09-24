@@ -85,7 +85,7 @@ jobs:
         server: ${{ fromJson(needs.create-deploy-artifacts.outputs.deployment-matrix) }}
 
     steps:
-      - name: Set directory permissions
+      - name: Create directories
 
         uses: appleboy/ssh-action@master
 
@@ -99,7 +99,8 @@ jobs:
           port: ${{ matrix.server.port }}
 
           script: |
-            echo ${{ secrets.USERPWD }} | sudo -S chmod -R u+w ${{ matrix.server.path }}
+            echo ${{ secrets.USERPWD }} | sudo -S mkdir -p "${{ matrix.server.path }}/artifacts"
+            echo ${{ secrets.USERPWD }} | sudo -S chmod -R u+w "${{ matrix.server.path }}/artifacts"
 
       - uses: actions/download-artifact@v4
 
