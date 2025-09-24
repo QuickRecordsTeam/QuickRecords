@@ -14,7 +14,7 @@ class UpdatePaymentItemType extends Migration
      */
     public function up()
     {
-        DB::statement("ALTER TABLE `payment_items` CHANGE `type` `type` ENUM('ALL_MEMBERS', 'A_MEMBER', 'GROUPED_MEMBERS') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ALL_MEMBERS';");
+        DB::statement("ALTER TABLE `payment_items` CHANGE `type` ENUM('ALL_MEMBERS', 'A_MEMBER', 'GROUPED_MEMBERS') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ALL_MEMBERS';");
     }
 
     /**
