@@ -1,13 +1,11 @@
 <?php
 
 use App\Constants\PaymentItemType;
-use Faker\Provider\ar_EG\Payment;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class UpdatePaymentItemType extends Migration
+class AddTypeColumnPaymentItems extends Migration
 {
     /**
      * Run the migrations.
@@ -17,7 +15,7 @@ class UpdatePaymentItemType extends Migration
     public function up()
     {
         Schema::table('payment_items', function (Blueprint $table) {
-            $table->dropColumn('type');
+            $table->enum('type', [PaymentItemType::A_MEMBER, PaymentItemType::ALL_MEMBERS, PaymentItemType::GROUPED_MEMBERS])->default(PaymentItemType::ALL_MEMBERS);
         });
     }
 
@@ -28,8 +26,6 @@ class UpdatePaymentItemType extends Migration
      */
     public function down()
     {
-        Schema::table('your_table_name', function (Blueprint $table) {
-            $table->dropColumn('type');
-        });
+        //
     }
 }
