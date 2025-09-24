@@ -50,9 +50,6 @@ jobs:
 
         run: composer dump-autoload
 
-      - name: Run migrations
-        run: php artisan migrate
-
       - name: Create deployment artifacts
 
         env:
