@@ -35,7 +35,7 @@ jobs:
         run: composer install
 
       - name: Dump autoload files
-        run: composer dump-autoload
+        run: composer dump-autoload -o
 
       - name: Generate key
         run: php artisan key:generate
