@@ -100,7 +100,7 @@ jobs:
 
           script: |
             echo ${{ secrets.USERPWD }} | sudo -S mkdir -p "${{ matrix.server.path }}/artifacts"
-            echo ${{ secrets.USERPWD }} | sudo -S chmod -R u+w "${{ matrix.server.path }}/artifacts"
+            echo ${{ secrets.USERPWD }} | sudo -S chmod -R 0777 "${{ matrix.server.path }}/artifacts"
 
       - uses: actions/download-artifact@v4
 
