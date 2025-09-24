@@ -16,17 +16,16 @@ class OrganisationSeeder extends Seeder
     {
         Organisation::create([
             'id'            => Str::uuid()->toString(),
-            'name'          => "Brothers Corner Great Soppo (BROCON)",
-            'email'         => "brocon@gmail.com",
+            'name'          => "QuickRecords",
+            'email'         => "support@quickrecords.com",
             'region'        => "Southwest",
             'telephone'     => "+237683404289",
             'address'       => "Buea",
-            'description'   => "The Brothers Corner of the Christian Youth Fellowship Movement of the Presbyterian Church in Cameroon, in Great Soppo",
+            'description'   => "Streamlinning Finance Management within an Organisation, Church, Group or Business",
             'logo'          => "",
-            'salutation'    => "Brothers we lead the way. In Christ we Head the Trail",
+            'salutation'    => "Streamlining Finance Management with Innovative Technology",
             'box_number'    => 1523,
             'updated_by'    => "Admin"
         ]);
-
     }
 }

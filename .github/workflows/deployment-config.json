@@ -1,0 +1,10 @@
+[
+    {
+        "name":"server-1",
+        "ip": "13.61.175.51",
+        "port":"22",
+        "beforeHooks":"",
+        "afterHooks":"",
+        "path":"/var/www"
+    }
+]
