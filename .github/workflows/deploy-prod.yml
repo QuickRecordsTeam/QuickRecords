@@ -90,9 +90,6 @@ jobs:
         with:
           name: app-build
 
-      - name: Create artifact directories
-        run: |
-          echo ${{ secrets.USERPWD }} | sudo -S mkdir -p "${{ matrix.server.path }}/artifacts"
       - name: Upload Artifact to server
         uses: appleboy/scp-action@master
         with:
