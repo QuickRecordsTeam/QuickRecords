@@ -40,7 +40,7 @@ jobs:
         run: touch ./database/database.sqlite
 
       - name: Copy .env
-        run: cp .env.testing .env
+        run: cp .env.example .env
 
       - name: Install Composer dependencies
 
