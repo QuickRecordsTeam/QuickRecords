@@ -34,7 +34,7 @@ jobs:
         with:
           php-version: 8.3
 
-          extensions: mbstring, ctype, fileinfo, openssl, PDO, bcmath, json, tokenizer, xml, curl, pdo_mysql, zip
+          extensions: mbstring, ctype, fileinfo, openssl, PDO, bcmath, json, tokenizer, xml, curl, pdo_mysql, zip, gd
 
       - name: Create database
         run: touch ./database/database.sqlite
