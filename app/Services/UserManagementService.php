@@ -285,7 +285,9 @@ class UserManagementService implements UserManagementInterface
     public function importUsers($organisation_id, $request)
     {
         $memberRole = CustomRole::findByName(Roles::MEMBER, 'api');
+
         $updated_by = ($request->user()->name);
+
         return Excel::import(new UsersImport($organisation_id, $updated_by, $memberRole->id), $request->file('file'));
     }
 

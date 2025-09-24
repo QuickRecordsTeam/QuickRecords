@@ -44,9 +44,9 @@ class UsersImport implements ToModel, WithStartRow, WithCustomCsvSettings
      */
     public function model(array $row)
     {
-        dd($row);
+
         $exist = User::where('email', $row[1])->where('telephone', str_replace(" ", "", $row[2]))->first();
-        dd($exist);
+
         if (! isset($exist)) {
             $saved = User::create([
                 'name'            => $row[0],
