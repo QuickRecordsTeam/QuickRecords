@@ -20,12 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # - name: Compile CSS and Javascript
+      - name: Compile CSS and Javascript
 
-      #   run: |
-      #     npm update
-      #     npm install
-      #     npm run build
+        run: |
+          npm update
+          npm install
+          npm run build
 
       - name: Configure PHP 8.3
 
@@ -260,7 +260,7 @@ jobs:
 
             echo ${{ secrets.USERPWD }} | sudo -S chmod -R 0777 $ACTIVE_RELEASE_PATH/bootstrap/cache
 
-            cd $ACTIVE_RELEASE_PATH && composer install && php artisan down && php artisan migrate --force && php artisan db:seed && php artisan up
+            cd $ACTIVE_RELEASE_PATH && composer install && php artisan down && php artisan migrate --force && php artisan up
 
             echo ${{ secrets.USERPWD }} | sudo -S systemctl reload nginx
 

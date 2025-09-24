@@ -21,6 +21,9 @@ jobs:
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
+      # - name: Copy .env
+      #   run: cp .env.testing .env
+
       # - name: Set DEV DB Configs
       #   run: |
       #     echo "DB_HOST=${{ secrets.DEV_DB_HOST }}" >> .env
