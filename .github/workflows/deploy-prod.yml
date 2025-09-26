@@ -20,12 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Compile CSS and Javascript
+      # - name: Compile CSS and Javascript
 
-        run: |
-          npm update
-          npm install
-          npm run build
+      #   run: |
+      #     npm update
+      #     npm install
+      #     npm run build
 
       - name: Configure PHP 8.3
 
