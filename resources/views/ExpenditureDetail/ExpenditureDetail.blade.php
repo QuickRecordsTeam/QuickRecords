@@ -26,7 +26,7 @@
         </div> --}}
         <div class="column_100" style="margin-left: 30px">
             <div class="column_25">
-                <img src="{{ public_path($organisation_logo) }}" alt="organisation logo" width="100px;" height="100px;"
+                <img src="{{ public_path('images/App_Logo.png') }}" alt="organisation logo" width="100px;" height="100px;"
                     style="border-radius: 2px">
             </div>
             <div class="column_50" style="text-align: center;">
@@ -34,7 +34,7 @@
                     {{ $organisation->name }} - {{ $organisation->address }}</label><br />
             </div>
             <div class="column_25">
-                <img src="{{ public_path($organisation_logo) }}" alt="organisation logo" width="100px;" height="100px;"
+                <img src="{{ public_path('images/App_Logo.png') }}" alt="organisation logo" width="100px;" height="100px;"
                     style="border-radius: 2px">
             </div>
         </div>
