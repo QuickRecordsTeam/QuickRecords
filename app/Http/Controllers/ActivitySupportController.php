@@ -50,7 +50,6 @@ class ActivitySupportController extends Controller
         $this->activity_support_service->updateActivitySupport($id, $request);
 
         return $this->sendResponse('success', 204);
-
     }
 
 
@@ -82,7 +81,8 @@ class ActivitySupportController extends Controller
         return $this->sendResponse('success', 204);
     }
 
-    private function prepareData(Request $request) {
+    private function prepareData(Request $request)
+    {
         $sponsorships      = $this->fetchAll($request);
         $sponsorships      = json_decode(json_encode($sponsorships))->original->data;
         return $sponsorships;
@@ -121,25 +121,23 @@ class ActivitySupportController extends Controller
         return $pdf->download('ActivitySupport.pdf');
     }
 
-    public function setTitle(Request $request){
-       if(isset($request->payment_item_label)){
-           $title = 'Sponsorships for '.$request->payment_item_label;
-       }else {
-           $title = 'Organisation Sponsorships';
-       }
+    public function setTitle(Request $request)
+    {
+        if (isset($request->payment_item_label)) {
+            $title = 'Sponsorships for ' . $request->payment_item_label;
+        } else {
+            $title = 'Organisation Sponsorships';
+        }
 
-       return $title;
+        return $title;
     }
 
     private function getFilePath($organisation)
     {
         $organisationName = str_replace(" ", "", $organisation->name);
 
-        $directory      = $organisationName."/"."LOGOS"."/"."Picture1.png";
+        $directory      = $organisationName . "/" . "LOGOS" . "/" . "Picture1.png";
 
-        return FileStorageConstants::FETCH_FILE_BASE_DIRECTORY.$directory;
+        return FileStorageConstants::FETCH_FILE_BASE_DIRECTORY . $directory;
     }
-
-
-
 }
