@@ -8,15 +8,15 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "8.3",
         "ext-gd": "*",
         "ext-json": "*",
-        "barryvdh/laravel-dompdf": "^2.0",
+        "barryvdh/laravel-dompdf": "^3.0",
         "doctrine/dbal": "^2.10",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "*",
         "guzzlehttp/guzzle": "^7.9",
-        "laravel/framework": "8.*||^9.19",
+        "laravel/framework": "^9.0",
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.9",
         "laravel/ui": "*",
@@ -27,7 +27,7 @@
         "spatie/laravel-permission": "^5.3"
     },
     "require-dev": {
-        "facade/ignition": "^2.3.6",
+        "spatie/laravel-ignition": "^1.0",
         "fakerphp/faker": "^1.23",
         "knuckleswtf/scribe": "^4.37",
         "mockery/mockery": "^1.6",
