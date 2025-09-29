@@ -9,7 +9,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
-class isPresidentOrisFinancialSecretary
+class IsPresidentOrisFinancialSecretary
 {
     use ResponseTrait;
     /**
@@ -21,7 +21,7 @@ class isPresidentOrisFinancialSecretary
      */
     public function handle(Request $request, Closure $next)
     {
-        if(count(collect($request->user()->roles->toArray())->whereIn('name', [Roles::MEMBER, Roles::PRESIDENT, Roles::FINANCIAL_SECRETARY])->toArray()) < 2){
+        if (count(collect($request->user()->roles->toArray())->whereIn('name', [Roles::MEMBER, Roles::PRESIDENT, Roles::FINANCIAL_SECRETARY])->toArray()) < 2) {
             return ResponseTrait::sendError('Access denied', 'You dont have the role to access this route', 403);
         }
         return $next($request);
