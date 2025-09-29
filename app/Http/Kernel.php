@@ -18,6 +18,7 @@ use App\Http\Middleware\IsTreasurerOrIsFinancialSecretaryOrIsPresident;
 use App\Http\Middleware\IsUserMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
+
 class Kernel extends HttpKernel
 {
     /**
@@ -28,9 +29,10 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-        // \App\Http\Middleware\TrustHosts::class,
-        \App\Http\Middleware\TrustProxies::class,
-        \Fruitcake\Cors\HandleCors::class,
+        \Illuminate\Http\Middleware\HandleCors::class,
+
+        \Illuminate\Http\Middleware\TrustProxies::class,
+
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
@@ -83,13 +85,13 @@ class Kernel extends HttpKernel
         // 'permission'            => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         // 'role_or_permission'    => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
 
-        'isPresident'           => isPresidentMiddleware::class,
+        'isPresident'           => IsPresidentMiddleware::class,
         'isAdmin'               => IsAdminMiddleware::class,
         'isAuditor'             => IsAuditorMiddleware::class,
         'isFinancialSecretary'  => IsFinancialSecretaryMiddleware::class,
         'isTreasurer'           => IsTreasurerMiddleware::class,
         'isUser'                => IsUserMiddleware::class,
-        'isPresidentOrIsFinancialSecretary' => isPresidentOrisFinancialSecretary::class,
+        'isPresidentOrIsFinancialSecretary' => IsPresidentOrisFinancialSecretary::class,
         'isTreasurerOrIsFinancialSecretary' => IsTreasurerOrIsFinancialSecretary::class,
         'isTreasurerOrIsFinancialSecretaryOrIsPresident' => IsTreasurerOrIsFinancialSecretaryOrIsPresident::class,
         'isElectionAdmin' => IsElectionAdmin::class,
