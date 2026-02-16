@@ -4,10 +4,11 @@ namespace App\Interfaces;
 
 interface PaymentInterface
 {
-    public function createPayment($request);
-    public function updatePayment($id, $request);
+    public function fetchPaymentToken();
+    public function initiatePayment($request);
     public function getPayment($id);
-    public function deletePayment($id);
+    public function checkPaymentStatus($request);
+    public function handlePaymentCallback($request);
     public function filterPayments($request);
-    public function fetchAllPayments($request);
+    public function fetchClientPayments($request);
 }

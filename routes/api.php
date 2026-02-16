@@ -12,6 +12,7 @@ use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\MemberRegistrationController;
 use App\Http\Controllers\OrganisationController;
 use App\Http\Controllers\PaymentCategoryController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentItemController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\RegistrationController;
@@ -56,8 +57,12 @@ Route::middleware('isAuthorizedToSubscribe')->group(function () {
     Route::prefix('protected/init')->group(function () {
         Route::post('/subscriptions', [SubscriptionController::class, 'createSubscription']); //first subscription for the organisation, after this the user can access access the application. The payment must intercepted and either completed or set package set to trailing before the completion of this process
         Route::post('/client/subscriptions/{id}/payment-fee', [SubscriptionController::class, 'computeTotalSubscriptionAmount']);
+        Route::post('/client/subscriptions/{id}/initiate-payment', [PaymentController::class, 'initiatePayment']);
+        Route::get('/client/subscriptions/{id}/payment-status', [PaymentController::class, 'checkPaymentStatus']);
     });
 });
+
+Route::post('/payment-callback', [PaymentController::class, 'handlePaymentCallback']);
 
 Route::middleware(['auth:sanctum', 'subscribed'])->group(function () {
 
@@ -75,6 +80,7 @@ Route::middleware(['auth:sanctum', 'subscribed'])->group(function () {
         Route::get('/subscriptions/{id}', [SubscriptionController::class, 'showSubscription']);
         Route::put('/subscriptions/{id}/update', [SubscriptionController::class, 'update']);
         Route::delete('/subscriptions/{id}/delete', [SubscriptionController::class, 'deleteClientSubscription']);
+        Route::get('/subscriptions/payments', [PaymentController::class, 'fetchClientPayments']);
     });
 
     Route::prefix('protected/roles')->group(function () {
@@ -397,6 +403,8 @@ Route::prefix('protected/system-admin')->middleware(['auth:sanctum', 'isSystemAd
     Route::delete('/subscriptions/{id}/delete', [SubscriptionController::class, 'destroy']);
     Route::get('/subscriptions/filter', [SubscriptionController::class, 'filterClientSubscription']);
     Route::get('/fetch-organisations', [OrganisationController::class, 'getOrganisations']);
+    Route::get('/subscriptions/payments/filter', [UserController::class, 'filterPayments']);
+    Route::get('/subscriptions/payments/{id}', [UserController::class, 'showPayment']);
 });
 Route::prefix('public')->group(function () {
     Route::get('/subscription-plans/{id}', [\App\Http\Controllers\SubscriptionPlanController::class, 'getSubscriptionPlan']);

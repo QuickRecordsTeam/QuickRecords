@@ -17,10 +17,14 @@ return new class extends Migration
             $table->uuid('subscription_id');
             $table->decimal('amount', 10, 2);
             $table->string('payment_method');
-            $table->enum('transaction_status', ["PENDING", "COMPLETE", "FAILED"])->default('PENDING');
+            $table->enum('transaction_status', ["PENDING", "SUCCESSFUL", "FAILED"])->default('PENDING');
             $table->dateTime('payment_date');
             $table->string('transaction_id');
             $table->string('transaction_number');
+            $table->string('description')->nullable();
+            $table->string('transaction_type');
+            $table->string('external_transaction_id');
+             $table->string('financial_transaction_id');
             $table->timestamps();
 
             $table->foreign('subscription_id')->references('id')->on('subscriptions');

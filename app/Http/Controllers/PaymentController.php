@@ -2,64 +2,59 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\InitPaymentRequest;
+use App\Http\Requests\PaymentCallbackRequest;
 use App\Models\Payment;
+use App\Models\Subscription;
+use App\Services\SubscriptionPaymentService;
+use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ResponseTrait;
+    private SubscriptionPaymentService $paymentService;
+
+    public function __construct(SubscriptionPaymentService $paymentService)
     {
-        //
+        $this->paymentService = $paymentService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function filterPayments(Request $request)
     {
-        //
+        $data = $this->paymentService->filterPayments($request);
+        return $this->successResponse($data, "Payments filtered successfully");
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+
+    public function fetchClientPayments(Request $request)
     {
-        //
+        $data = $this->paymentService->fetchClientPayments($request);
+        return $this->successResponse($data, "Client payments retrieved successfully");
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Payment $payment)
+    public function initiatePayment(InitPaymentRequest $request)
     {
-        //
+        $data = $this->paymentService->initiatePayment($request);
+        return $this->successResponse($data, "Payment initiated successfully");
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Payment $payment)
+
+    public function showPayment(Payment $payment)
     {
-        //
+        $data = $this->paymentService->getPayment($payment->id);
+        return $this->successResponse($data, "Payment details retrieved successfully");
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Payment $payment)
+    public function checkPaymentStatus($reference)
     {
-        //
+        $data = $this->paymentService->checkPaymentStatus($reference);
+        return $this->successResponse($data, "Payment status retrieved successfully");
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Payment $payment)
+    public function handlePaymentCallback(PaymentCallbackRequest $request)
     {
-        //
+        $data = $this->paymentService->handlePaymentCallback($request);
+        return $this->successResponse($data, "Payment callback handled successfully");
     }
 }
