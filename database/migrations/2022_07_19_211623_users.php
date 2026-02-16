@@ -28,6 +28,7 @@ class Users extends Migration
             $table->timestamps();
             $table->uuid('organisation_id')->nullable();
             $table->string('updated_by');
+            $table->string('username')->unique();
 
             $table->foreign('organisation_id')->references('id')->on('organisations')->cascadeOnDelete();
         });

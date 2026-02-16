@@ -30,10 +30,10 @@ class UserSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
-         $admin =  User::create([
+        $admin =  User::create([
             'name'            => "Suh Edmond Neba",
             'email'           => "suhedmond25@yahoo.com",
-            'telephone'       => "+237673660071",
+            'telephone'       => "+2376736622071",
             'gender'          => "MALE",
             'address'         => "Buea, Cameroon",
             'occupation'      => 'Software Engineer',
@@ -41,13 +41,36 @@ class UserSeeder extends Seeder
             'updated_by'      => "Edmond",
             'status'          => SessionStatus::ACTIVE,
             'password'        => Hash::make("Summer123!"),
-            "email_verified_at" => Carbon::now()
+            "email_verified_at" => Carbon::now(),
+            'username'        => "suhedmond25"
         ]);
 
         $admin_role = CustomRole::findByName(Roles::MEMBER, 'api');
         $admin_role2 = CustomRole::findByName(Roles::ADMIN, 'api');
         $this->saveUserRole($admin, $admin_role,  "Admin");
         $this->saveUserRole($admin, $admin_role2,  "Admin");
+
+
+        $sys_admin =  User::create([
+            'name'            => "Test User1",
+            'email'           => "testuser1@gmail.com",
+            'telephone'       => "+237674667771",
+            'gender'          => "MALE",
+            'address'         => "Buea, Cameroon",
+            'occupation'      => 'Software Engineer',
+            'organisation_id' => $this->organisation[0],
+            'updated_by'      => "Edmond",
+            'status'          => SessionStatus::ACTIVE,
+            'password'        => Hash::make("Summer123!"),
+            "email_verified_at" => Carbon::now(),
+            'username'          => "testuser1"
+
+        ]);
+
+        $sys_admin_role = CustomRole::findByName(Roles::MEMBER, 'api');
+        $sys_admin_role2 = CustomRole::findByName(Roles::SYSTEM_ADMIN, 'api');
+        $this->saveUserRole($sys_admin, $sys_admin_role,  "Admin");
+        $this->saveUserRole($sys_admin, $sys_admin_role2,  "Admin");
 
 
 

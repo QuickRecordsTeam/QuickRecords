@@ -2,64 +2,78 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SubscriptionPaymentFeeRequest;
+use App\Http\Requests\SubscriptionRequest;
+use App\Http\Requests\UpdateSubscriptionRequest;
 use App\Models\Subscription;
+use App\Services\SubscriptionService;
+use App\Traits\ResponseTrait;
+use GuzzleHttp\Promise\Create;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ResponseTrait;
+    private SubscriptionService $subscriptionService;
+
+    public function __construct(SubscriptionService $subscriptionService)
     {
-        //
+        $this->subscriptionService = $subscriptionService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function fetchAllClientSubscriptions(Request $request)
     {
-        //
+        $subscriptions = $this->subscriptionService->fetchAllClientSubscriptions($request);
+
+        return $this->sendResponse($subscriptions, 'success');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function filterClientSubscription(Request $request)
     {
-        //
+        $subscriptions = $this->subscriptionService->filterSubscription($request);
+
+        return $this->sendResponse($subscriptions, 'success');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Subscription $subscription)
+    public function createSubscription(SubscriptionRequest $request)
     {
-        //
+        $data = $this->subscriptionService->createSubscription($request);
+
+        return $this->sendResponse($data, 'Subscription created successfully');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Subscription $subscription)
+    public function showSubscription($id)
     {
-        //
+        $data = $this->subscriptionService->getSubscription($id);
+
+        return $this->sendResponse($data, 'success');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Subscription $subscription)
+    public function update(UpdateSubscriptionRequest $request,  $id)
     {
-        //
+        $data = $this->subscriptionService->updateSubscription($id, $request);
+
+        return $this->sendResponse($data, 'Subscription updated successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Subscription $subscription)
     {
-        //
+        $this->subscriptionService->deleteSubscription($subscription);
+
+        return $this->sendResponse('success', 'Subscription successfully been removed');
+    }
+
+    public function deleteClientSubscription($id, Request $request)
+    {
+        $this->subscriptionService->deleteClientSubscription($id, $request);
+
+        return $this->sendResponse('success', 'Subscription successfully been removed');
+    }
+
+    public function computeTotalSubscriptionAmount(SubscriptionPaymentFeeRequest $request, $id)
+    {
+        $data = $this->subscriptionService->computeTotalSubscriptionAmount($id, $request);
+
+        return $this->sendResponse($data, 'success');
     }
 }

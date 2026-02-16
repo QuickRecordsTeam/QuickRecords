@@ -32,7 +32,7 @@ class SubscriptionSeeder extends Seeder
                 'subscription_plan_id' => $subscription_plan['id'],
                 'status' => $faker->randomElement(['active', 'inactive', 'cancelled']),
                 'auto_renewal' => $faker->boolean,
-                'referral_code_discount_percentage' => $faker->randomFloat(2, 0, 20),
+                'referral_code_discount' => $faker->randomFloat(2, 0, 20),
                 'current_period_start_date' => $current_period_start_date,
                 'current_period_end_date' => $current_period_end_date,
                 'trial_period_start_date' => $is_trail ? $faker->dateTimeBetween('-1 month', 'now') : null,

@@ -12,6 +12,7 @@ use App\Http\Middleware\IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin;
 use App\Http\Middleware\isPresidentMiddleware;
 use App\Http\Middleware\IsPresidentOrIsAdmin;
 use App\Http\Middleware\isPresidentOrisFinancialSecretary;
+use App\Http\Middleware\IsSystemAdminMiddleware;
 use App\Http\Middleware\IsTreasurerMiddleware;
 use App\Http\Middleware\IsTreasurerOrIsFinancialSecretary;
 use App\Http\Middleware\IsTreasurerOrIsFinancialSecretaryOrIsPresident;
@@ -98,7 +99,12 @@ class Kernel extends HttpKernel
         'IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin' => IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin::class,
         'isPresidentOrIsAdmin' => IsPresidentOrIsAdmin::class,
         'isAdminIsPresidentIsFinancialSecretary' => IsAdminIsPresidentIsFinancialSecretary::class,
-        'IsAdminOrIsTreasurer' => IsAdminOrIsTreasurer::class
+        'IsAdminOrIsTreasurer' => IsAdminOrIsTreasurer::class,
+        'isSystemAdmin' => IsSystemAdminMiddleware::class,
+        'subscribed' => \App\Http\Middleware\SubscriptionMiddleware::class,
+        'isAuthorizedToAccessPlatform' => \App\Http\Middleware\IsAuthorizedToAccessPlatform::class,
+        'isAuthorizedToCreateOrganisation' => \App\Http\Middleware\IsAuthorizedToCreateOrganisation::class,
+        'isAuthorizedToSubscribe' => \App\Http\Middleware\IsAuthorizedToSubscribe::class,
 
     ];
 }

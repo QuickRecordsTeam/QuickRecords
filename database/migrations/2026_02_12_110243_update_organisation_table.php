@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('organisations', function (Blueprint $table) {
             $table->string('referral_code')->nullable();
             $table->string('referred_code')->nullable();
+            $table->integer('referral_count')->default(0);
         });
     }
 

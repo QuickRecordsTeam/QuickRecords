@@ -26,7 +26,8 @@ class OrganisationSeeder extends Seeder
                 'box_number' => $faker->randomNumber(5),
                 'logo' => $faker->imageUrl(200, 200, 'business'),
                 'salutation' => $faker->catchPhrase,
-                'updated_by' => $faker->name
+                'updated_by' => $faker->name,
+                'referral_code' => $faker->unique()->bothify('REF-#####') // Generate a unique referral code
             ]);
         }
     }

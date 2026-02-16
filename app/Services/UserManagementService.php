@@ -11,6 +11,7 @@ use App\Constants\SessionStatus;
 use App\Exceptions\BusinessValidationException;
 use App\Exceptions\EmailException;
 use App\Exceptions\UnAuthorizedException;
+use App\Http\Resources\CreateAccountResource;
 use App\Http\Resources\MemberInviteNotification;
 use App\Http\Resources\PasswordResetResponse;
 use App\Http\Resources\TokenResource;
@@ -218,11 +219,10 @@ class UserManagementService implements UserManagementInterface
     public function loginUser($request)
     {
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = $request->attributes->get('user');
         if (!Hash::check($request->password, $user->password)) {
             throw new UnAuthorizedException('Bad Credentials', 403);
         } else {
-            $this->validateIfUserCanLogin($user);
             $token = $this->generateToken($user);
             $hasLoginBefore = $this->checkIfUserHasLogin($user);
             $currentSession = $this->session_service->getCurrentSession();
@@ -232,12 +232,16 @@ class UserManagementService implements UserManagementInterface
 
     public function createAccount($request)
     {
-        return User::create([
+        $user = User::create([
             'name'       => $request->name,
             'telephone'  => str_replace(" ", "", $request->telephone),
             'password'   => Hash::make($request->password),
             'email'      => $request->email,
+            'username'   => str_replace(" ", "", $request->username),
+            'email_verified_at' => Carbon::now()->toDateTimeString()
         ]);
+
+        return new CreateAccountResource($user, $user->username, $user->email, $user->id);
     }
 
     public function setPassword($request)
@@ -362,7 +366,6 @@ class UserManagementService implements UserManagementInterface
             'email'  => 'required|email'
         ]);
         $user = User::where('email', $request->email)->firstOrFail();
-        $this->validateIfUserCanLogin($user);
         $token = $this->generateSecurityToken(7);
         $redirectLink = env('PASSWORD_RESET_UI_REDIRECT_LINK') . $this->generateSecurityToken(20);
         $organisation_logo = $user->organisation->logo;
@@ -407,7 +410,6 @@ class UserManagementService implements UserManagementInterface
                 throw new UnAuthorizedException("Password Reset token has Expired", 403);
             }
             $user = User::findOrFail($request->user_id);
-            $this->validateIfUserCanLogin($user);
             $user->password = Hash::make($request->new_password);
             $user->save();
 

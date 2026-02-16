@@ -132,6 +132,9 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'subscription_caution_period' => env('SUBSCRIPTION_PAST_DUE_CAUTION_PERIOD', 3),
+    'subscription_referral_bonus_percent' => env('SUBSCRIPTION_REFERRAL_BONUS_PERCENT', 10),
+    'payment_charge_fee_percentage' => env('PAYMENT_CHARGE_FEE_PERCENTAGE', 2),
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

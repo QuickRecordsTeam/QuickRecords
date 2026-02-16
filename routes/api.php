@@ -17,6 +17,7 @@ use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TransactionHistoryController;
 use App\Http\Controllers\UserContributionController;
 use App\Http\Controllers\UserController;
@@ -37,24 +38,43 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('public/auth')->group(function () {
-    Route::post('/login', [UserController::class, 'logInUser']);
+    Route::post('/login', [UserController::class, 'logInUser'])->middleware('isAuthorizedToAccessPlatform');
     Route::post('/signup', [UserController::class, 'createAccount']);
-    Route::post('/check-user', [UserController::class, 'checkUserExist']);
-    Route::post('/set-password', [UserController::class, 'setPassword']);
-    Route::post('/reset-password-token', [UserController::class, 'setPasswordResetToken']);
-    Route::post('/validate/password-reset', [UserController::class, 'validateResetToken']);
-    Route::post('/reset-password', [UserController::class, 'resetPassword']);
+    Route::post('/check-user', [UserController::class, 'checkUserExist'])->middleware('isAuthorizedToAccessPlatform');
+    Route::post('/set-password', [UserController::class, 'setPassword'])->middleware('isAuthorizedToAccessPlatform');
+    Route::post('/reset-password-token', [UserController::class, 'setPasswordResetToken'])->middleware('isAuthorizedToAccessPlatform');
+    Route::post('/validate/password-reset', [UserController::class, 'validateResetToken'])->middleware('isAuthorizedToAccessPlatform');
+    Route::post('/reset-password', [UserController::class, 'resetPassword'])->middleware('isAuthorizedToAccessPlatform');
+    Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware('isAuthorizedToCreateOrganisation');
 });
 
 Route::prefix('public/quickrecords/')->group(function () {
     Route::post('send-inquiry-message', [InquiryController::class, 'sendMessage']);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('isAuthorizedToSubscribe')->group(function () {
+    Route::prefix('protected/init')->group(function () {
+        Route::post('/subscriptions', [SubscriptionController::class, 'createSubscription']); //first subscription for the organisation, after this the user can access access the application. The payment must intercepted and either completed or set package set to trailing before the completion of this process
+        Route::post('/client/subscriptions/{id}/payment-fee', [SubscriptionController::class, 'computeTotalSubscriptionAmount']);
+    });
+});
+
+Route::middleware(['auth:sanctum', 'subscribed'])->group(function () {
+
+    Route::post('/logout', [UserController::class, 'logOutUser']);
 
     Route::prefix('protected')->middleware('IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin')->group(function () {
         Route::post("/upload_file", [FileUploadController::class, 'uploadFile']);
         Route::get("/get_file", [FileUploadController::class, 'getUploadFile']);
+    });
+
+    //after the user has a subscription, the user can access the subscription routes with the subscribed and auth middleware
+    Route::prefix('protected/client')->group(function () {
+        Route::post('/subscriptions', [SubscriptionController::class, 'createSubscription']);
+        Route::get('/subscriptions', [SubscriptionController::class, 'fetchAllClientSubscriptions']);
+        Route::get('/subscriptions/{id}', [SubscriptionController::class, 'showSubscription']);
+        Route::put('/subscriptions/{id}/update', [SubscriptionController::class, 'update']);
+        Route::delete('/subscriptions/{id}/delete', [SubscriptionController::class, 'deleteClientSubscription']);
     });
 
     Route::prefix('protected/roles')->group(function () {
@@ -98,7 +118,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('protected/users/{id}', [UserController::class, 'deleteUser'])->middleware('isPresidentOrIsAdmin');
 
     Route::prefix('protected')->middleware('isPresidentOrIsAdmin')->group(function () {
-        Route::post('/organisations', [OrganisationController::class, 'createOrganisation']);
+        Route::post('/organisations', [OrganisationController::class, 'createOrganisation'])->middleware('isAuthorizedToCreateOrganisation');
         Route::get('/organisations/{id}', [OrganisationController::class, 'getOrganisation']);
         Route::put('/organisations/{id}', [OrganisationController::class, 'updateOrganisation']);
         Route::put('/organisations/{id}/update_telephone', [OrganisationController::class, 'updateTelephoneNumber']);
@@ -368,4 +388,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('protected')->middleware('isPresidentOrIsAdmin')->group(function () {
         Route::post('/transactions/update-history', [TransactionHistoryController::class, 'createTransactionHistory'])->name("api.change_transaction_record");
     });
+});
+
+Route::prefix('protected/system-admin')->middleware(['auth:sanctum', 'isSystemAdmin'])->group(function () {
+    Route::post('/subscription-plans', [\App\Http\Controllers\SubscriptionPlanController::class, 'createSubscriptionPlan']);
+    Route::put('/subscription-plans/{id}', [\App\Http\Controllers\SubscriptionPlanController::class, 'updateSubscriptionPlan']);
+    Route::delete('/subscription-plans/{id}', [\App\Http\Controllers\SubscriptionPlanController::class, 'deleteSubscriptionPlan']);
+    Route::delete('/subscriptions/{id}/delete', [SubscriptionController::class, 'destroy']);
+    Route::get('/subscriptions/filter', [SubscriptionController::class, 'filterClientSubscription']);
+    Route::get('/fetch-organisations', [OrganisationController::class, 'getOrganisations']);
+});
+Route::prefix('public')->group(function () {
+    Route::get('/subscription-plans/{id}', [\App\Http\Controllers\SubscriptionPlanController::class, 'getSubscriptionPlan']);
+    Route::get('/subscription-plans', [\App\Http\Controllers\SubscriptionPlanController::class, 'fetchAllSubscriptionPlans']);
+    Route::get('subscription_plans/filter', [\App\Http\Controllers\SubscriptionPlanController::class, 'filterSubscriptionPlan']);
 });

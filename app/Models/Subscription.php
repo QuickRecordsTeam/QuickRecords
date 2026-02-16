@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Constants\BillingCyclePlans;
 use App\Traits\GenerateUuid;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,7 +18,7 @@ class Subscription extends Model
         'organisation_id',
         'subscription_plan_id',
         'auto_renewal',
-        'referral_code_discount_percentage',
+        'referral_code_discount',
         'current_period_start_date',
         'current_period_end_date',
         'status',
@@ -48,4 +49,6 @@ class Subscription extends Model
         }
         return 0;
     }
+
+
 }

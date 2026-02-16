@@ -38,7 +38,8 @@ class User extends Authenticatable
         'updated_by',
         'picture',
         'status',
-        'email_verified_at'
+        'email_verified_at',
+        'username'
     ];
 
     /**

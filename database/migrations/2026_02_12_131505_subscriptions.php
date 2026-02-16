@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('organisation_id');
             $table->uuid('subscription_plan_id');
             $table->boolean('auto_renewal')->default(false);
-            $table->float('referral_code_discount_percentage')->nullable();
+            $table->decimal('referral_code_discount', 10, 2)->nullable();
             $table->dateTime('current_period_start_date');
             $table->dateTime('current_period_end_date');
             $table->enum('status', ['active', 'cancelled', 'inactive', 'incomplete', 'past_due', 'trialing'])->default('active');

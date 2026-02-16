@@ -3,25 +3,21 @@
 namespace App\Http\Middleware;
 
 use App\Constants\Roles;
-use App\Models\CustomRole;
 use App\Traits\ResponseTrait;
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class IsTreasurerOrIsFinancialSecretary
+class IsSystemAdminMiddleware
 {
-    use ResponseTrait;
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-
-        $allowedRoles =  [Roles::MEMBER, Roles::TREASURER, Roles::FINANCIAL_SECRETARY];
+        $allowedRoles =  [Roles::MEMBER, Roles::SYSTEM_ADMIN];
         $userRoles = $request->user()->roles->whereIn('name', $allowedRoles);
 
         if ($userRoles->isEmpty() || count($userRoles) < 2) {

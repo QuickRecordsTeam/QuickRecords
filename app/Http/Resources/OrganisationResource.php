@@ -7,6 +7,12 @@ use Ramsey\Uuid\Uuid;
 
 class OrganisationResource extends JsonResource
 {
+    private $org_admin_user_id;
+    public function __construct($resource, $org_admin_user_id = null)
+    {
+        parent::__construct($resource);
+        $this->org_admin_user_id = $org_admin_user_id;
+    }
     /**
      * Transform the resource into an array.
      *
@@ -27,7 +33,9 @@ class OrganisationResource extends JsonResource
             'logo'          => $this->logo,
             'salutation'    => $this->salutation,
             'created_at'    => $this->created_at,
-            'updated_at'    => $this->updated_at
+            'updated_at'    => $this->updated_at,
+            'user_id'       => $this->org_admin_user_id,
+            'subscriptions' => SubscriptionResource::collection($this->subscriptions)
         ];
     }
 }
