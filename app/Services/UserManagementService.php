@@ -11,9 +11,11 @@ use App\Constants\SessionStatus;
 use App\Exceptions\BusinessValidationException;
 use App\Exceptions\EmailException;
 use App\Exceptions\UnAuthorizedException;
+use App\Http\Resources\ClientVerificationResource;
 use App\Http\Resources\CreateAccountResource;
 use App\Http\Resources\MemberInviteNotification;
 use App\Http\Resources\PasswordResetResponse;
+use App\Http\Resources\SubscriptionResource;
 use App\Http\Resources\TokenResource;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
@@ -208,7 +210,8 @@ class UserManagementService implements UserManagementInterface
         $currentSession = $this->session_service->getCurrentSession();
         $token = $this->generateToken($user);
 
-        return new TokenResource(new UserResource($updated, $token, true), $currentSession);
+        $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+        return new TokenResource(new UserResource($updated, $token, true), $currentSession, new SubscriptionResource($active_subscription));
     }
 
     public function deleteUser($user_id)
@@ -226,7 +229,8 @@ class UserManagementService implements UserManagementInterface
             $token = $this->generateToken($user);
             $hasLoginBefore = $this->checkIfUserHasLogin($user);
             $currentSession = $this->session_service->getCurrentSession();
-            return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession);
+            $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+            return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession, new SubscriptionResource($active_subscription));
         }
     }
 
@@ -257,8 +261,8 @@ class UserManagementService implements UserManagementInterface
         $token = $this->generateToken($user);
         $hasLoginBefore = $this->checkIfUserHasLogin($user);
         $currentSession = $this->session_service->getCurrentSession();
-
-        return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession);
+        $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+        return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession, new SubscriptionResource($active_subscription));
     }
 
     public function updatePassword($request)
@@ -422,7 +426,8 @@ class UserManagementService implements UserManagementInterface
             } catch (Exception $exception) {
                 throw new EmailException("Could not send reset email link", 550);
             }
-            return new TokenResource(new UserResource($user, $token, true), $currentSession);
+            $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+            return new TokenResource(new UserResource($user, $token, true), $currentSession, new SubscriptionResource($active_subscription));
         } else {
             throw new UnAuthorizedException("Invalid token", 403);
         }
@@ -468,6 +473,19 @@ class UserManagementService implements UserManagementInterface
         foreach ($request->all() as $key => $value) {
             MemberInvitation::findOrFail($value['id'])->update(['has_seen_notification' => true]);
         }
+    }
+
+    public function verifyClientAccount($request)
+    {
+        $user = User::where('username', $request->input('username'))->first();
+        if (!$user) {
+            throw new BusinessValidationException("User account not found", 404);
+        }
+        if (!Hash::check($request->password, $user->password)) {
+            throw new BusinessValidationException("User account not found", 403);
+        }
+
+        return new ClientVerificationResource($user);
     }
     private function generateToken($user)
     {

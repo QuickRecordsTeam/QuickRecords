@@ -8,5 +8,6 @@ class PaymentStatus {
     public const APPROVED = 'APPROVED';
     public const DECLINED = 'DECLINED';
     public const FAILED = 'FAILED';
+    public const SUCCESSFUL = 'SUCCESSFUL';
 
 }

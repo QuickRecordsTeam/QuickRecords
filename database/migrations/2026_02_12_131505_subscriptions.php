@@ -18,8 +18,8 @@ return new class extends Migration
             $table->uuid('subscription_plan_id');
             $table->boolean('auto_renewal')->default(false);
             $table->decimal('referral_code_discount', 10, 2)->nullable();
-            $table->dateTime('current_period_start_date');
-            $table->dateTime('current_period_end_date');
+            $table->dateTime('current_period_start_date')->nullable();
+            $table->dateTime('current_period_end_date')->nullable();
             $table->enum('status', ['active', 'cancelled', 'inactive', 'incomplete', 'past_due', 'trialing'])->default('active');
             $table->dateTime('trial_period_end_date')->nullable();
             $table->dateTime('trial_period_start_date')->nullable();

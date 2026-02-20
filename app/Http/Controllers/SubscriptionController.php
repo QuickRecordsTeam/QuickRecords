@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SubscriptionPaymentFeeRequest;
 use App\Http\Requests\SubscriptionRequest;
 use App\Http\Requests\UpdateSubscriptionRequest;
+use App\Http\Resources\SubscriptionAmountResource;
 use App\Models\Subscription;
 use App\Services\SubscriptionService;
 use App\Traits\ResponseTrait;
-use GuzzleHttp\Promise\Create;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
@@ -72,8 +72,17 @@ class SubscriptionController extends Controller
 
     public function computeTotalSubscriptionAmount(SubscriptionPaymentFeeRequest $request, $id)
     {
-        $data = $this->subscriptionService->computeTotalSubscriptionAmount($id, $request);
+        $data = $this->subscriptionService->computeTotalSubscriptionAmount($id, $request->input('organisation_id'));
 
-        return $this->sendResponse($data, 'success');
+        $response = new SubscriptionAmountResource($data, $data['subscription'], max(round($data['totalAmount'], 2), 0), $data['chargeable_fee']);
+
+        return $this->sendResponse($response, 'success');
+    }
+
+    public function getClientIncompleteSubscription(Request $request)
+    {
+        $data = $this->subscriptionService->getClientIncompleteSubscription($request);
+
+        return $this->sendResponse($data, 'successfully');
     }
 }

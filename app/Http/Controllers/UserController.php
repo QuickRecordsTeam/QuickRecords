@@ -15,6 +15,7 @@ use App\Http\Requests\SetPasswordRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\VerifyClientAccountRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\RoleService;
@@ -234,6 +235,12 @@ class UserController extends Controller
         $this->user_management_service->markAllNotificationsAsRead($request);
 
         return $this->sendResponse("All notification mark as read","success");
+    }
+
+    public function verifyClientAccount(VerifyClientAccountRequest $request)
+    {
+        $data = $this->user_management_service->verifyClientAccount($request);
+        return $this->sendResponse($data, 'success');
     }
     private function setTitle(Request $request): string
     {

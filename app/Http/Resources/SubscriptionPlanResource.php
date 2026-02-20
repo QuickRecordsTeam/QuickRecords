@@ -18,7 +18,7 @@ class SubscriptionPlanResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'status' => $this->status,
-            'price' => $this->price,
+            'price' => (float) $this->price,
             'discount_percentage' => $this->discount_percentage,
             'features' => explode(',', $this->features),
             'billing_cycle' => $this->billing_cycle,

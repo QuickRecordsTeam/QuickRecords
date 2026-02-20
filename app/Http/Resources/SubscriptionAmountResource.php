@@ -9,12 +9,12 @@ class SubscriptionAmountResource extends JsonResource
 {
     private $total_amount;
     private $chargeable_percentage;
-    private $subscription_id;
+    private $subscription;
 
-    public function __construct($resource, $subscription_id, $total_amount, $chargeable_percentage)
+    public function __construct($resource, $subscription, $total_amount, $chargeable_percentage)
     {
         parent::__construct($resource);
-        $this->subscription_id = $subscription_id;
+        $this->subscription = $subscription;
         $this->total_amount = $total_amount;
         $this->chargeable_percentage = $chargeable_percentage;
     }
@@ -26,7 +26,7 @@ class SubscriptionAmountResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'subscription_id' => $this->id,
+            'subscription' => $this->subscription,
             'total_amount' => $this->total_amount,
             'chargeable_percentage' => $this->chargeable_percentage,
         ];

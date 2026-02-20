@@ -19,7 +19,12 @@ class Payment extends Model
         'payment_method',
         'transaction_status',
         'payment_date',
-        'transaction_number'
+        'transaction_number',
+        'description',
+        'transaction_id',
+        'external_transaction_id',
+        'financial_transaction_id',
+        'transaction_type'
     ];
 
     public function subscription()

@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use App\Constants\BillingCyclePlans;
+use App\Exceptions\BusinessValidationException;
 use App\Http\Resources\SubscriptionAmountResource;
 use App\Http\Resources\SubscriptionResource;
 use App\Interfaces\SubscriptionInterface;
 use App\Models\Organisation;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
+use App\Models\User;
 
 class SubscriptionService implements SubscriptionInterface
 {
@@ -16,18 +17,28 @@ class SubscriptionService implements SubscriptionInterface
     public function createSubscription($request)
     {
         $subscription_plan = SubscriptionPlan::where('id', $request->subscription_plan_id)->where('status', true)->first();
-        $organisation = Organisation::findOrFail($request->organisation_id);
+        $organisation = Organisation::find($request->organisation_id);
 
         if (is_null($subscription_plan)) {
             throw new \App\Exceptions\BusinessValidationException('Invalid subscription plan selected', 400);
         }
+        if(!$organisation){
+            throw new BusinessValidationException("Organisation not found", 404);
+        }
+
+        $active_sub = $organisation->subscriptions()->where('status', 'active')->first();
+
+        if($active_sub){
+            throw new BusinessValidationException("The Organisation currently have an active subscription", 400);
+        }
+
         $subscription = Subscription::create([
             'organisation_id' => $organisation->id,
             'subscription_plan_id' => $subscription_plan->id,
             'auto_renewal' => $request->auto_renewal,
             'is_trail' => $request->auto_renewal ? false : $request->is_trail,
-            'current_period_start_date' => $this->getSubscriptionDuration($subscription_plan)['current_period_start_date'],
-            'current_period_end_date' => $this->getSubscriptionDuration($subscription_plan)['current_period_end_date'],
+            'current_period_start_date' => null,
+            'current_period_end_date' => null,
             'trial_period_start_date' => $request->is_trail ? $this->getTrailDuration()['trial_period_start_date'] : null,
             'trial_period_end_date' => $request->is_trail ? $this->getTrailDuration()['trial_period_end_date'] : null,
             'status' => $request->is_trail ? 'trialing' : 'incomplete',
@@ -35,9 +46,7 @@ class SubscriptionService implements SubscriptionInterface
             'referral_code_discount' => $request->referral_code ? $this->calculateReferralDiscount($subscription_plan->price, $request->referral_code, $organisation) : 0,
         ]);
 
-        $this->updateReferralCount($request->referral_code);
-
-        return new SubscriptionResource($subscription);
+        return new SubscriptionResource($subscription, $request['login_id']);
     }
 
     public function updateSubscription($id, $request)
@@ -51,8 +60,8 @@ class SubscriptionService implements SubscriptionInterface
         $subscription->update([
             'subscription_plan_id' => $request->subscription_plan_id,
             'auto_renewal' => $request->auto_renewal,
-            'current_period_start_date' => $this->getSubscriptionDuration($subscription_plan)['current_period_start_date'],
-            'current_period_end_date' => $this->getSubscriptionDuration($subscription_plan)['current_period_end_date'],
+            'current_period_start_date' => null,
+            'current_period_end_date' => null,
             'trial_period_start_date' => $request->is_trail ? $this->getTrailDuration()['trial_period_start_date'] : null,
             'trial_period_end_date' => $request->is_trail ? $this->getTrailDuration()['trial_period_end_date'] : null,
             'status' => $request->is_trail ? 'trialing' : 'incomplete',
@@ -110,9 +119,8 @@ class SubscriptionService implements SubscriptionInterface
         return SubscriptionResource::collection($subscriptions);
     }
 
-    public function computeTotalSubscriptionAmount($subscriptionId, $request)
+    public function computeTotalSubscriptionAmount($subscriptionId, $orgId)
     {
-        $orgId = $request->input('organisation_id');
         $subscription = Subscription::where('id', $subscriptionId)->where('organisation_id', $orgId)->firstOrFail();
         $totalAmount = $subscription->subscriptionPlan->price;
 
@@ -125,21 +133,24 @@ class SubscriptionService implements SubscriptionInterface
         }
 
 
+
+
         if ((float) $subscription->referral_code_discount > 0) {
             $totalAmount = $totalAmount > 0 ? $totalAmount - (float) $subscription->referral_code_discount : (float) $subscription->subscriptionPlan->price - (float) $subscription->referral_code_discount;
         }
 
-        return new SubscriptionAmountResource($subscription, $subscription->id, max(round($totalAmount, 2), 0), (int) config('app.payment_charge_fee_percentage'));
+        return ["subscription" => $subscription, "totalAmount" => max(round($totalAmount, 2), 0), "chargeable_fee" => (int) config('app.payment_charge_fee_percentage')];
     }
 
-    private function getSubscriptionDuration($subscription_plan)
+    public function getClientIncompleteSubscription($request)
     {
-        $start = BillingCyclePlans::MONTHLY === $subscription_plan->billing_cycle ? \Carbon\Carbon::now()->startOfDay() : \Carbon\Carbon::now()->startOfYear();
-        $end = BillingCyclePlans::MONTHLY === $subscription_plan->billing_cycle ? \Carbon\Carbon::now()->addMonths(1) : \Carbon\Carbon::now()->addYears(1);
-        return [
-            'current_period_start_date' => $start,
-            'current_period_end_date' => $end
-        ];
+        $user = User::find('id', $request['login_id'])->first();
+        if(!$user){
+            throw new BusinessValidationException("Invalid account or user", 403);
+        }
+        $subscriptions = $user->organisation->subscriptions('status', 'incomplete')->get();
+
+        return SubscriptionResource::collection($subscriptions);
     }
 
     private function getTrailDuration()
@@ -163,13 +174,14 @@ class SubscriptionService implements SubscriptionInterface
             $organisation->update([
                 'referred_code' => $referral_code
             ]);
+
+            $this->updateReferralCount($referredOrganisation);
         }
         return $discountAmount;
     }
 
-    private function updateReferralCount($referral_code)
+    private function updateReferralCount($referredOrganisation)
     {
-        $referredOrganisation = Organisation::where('referral_code', $referral_code)->first();
         if ($referredOrganisation) {
             $referredOrganisation->increment('referral_count');
 

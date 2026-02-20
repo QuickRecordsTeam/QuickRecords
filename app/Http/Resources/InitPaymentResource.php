@@ -10,9 +10,9 @@ class InitPaymentResource extends JsonResource
     private $reference;
     private $ussd_code;
 
-    public function __construct($reference, $ussd_code)
+    public function __construct($resource, $reference, $ussd_code)
     {
-        parent::__construct(null);
+        parent::__construct($resource);
         $this->reference = $reference;
         $this->ussd_code = $ussd_code;
     }

@@ -60,7 +60,7 @@ class IsAuthorizedToAccessPlatform
 
         if ($subscription->status === 'past_due') {
             $cautionPeriod = config('app.subscription_caution_period', 3); // Use config() instead of env()
-            $daysPastDue = $now->diffInDays($subscription->updated_at);
+            $daysPastDue = $now->diffInDays($subscription->current_period_end_date);
 
             if ($daysPastDue > $cautionPeriod) {
                 return ResponseTrait::sendError('Access denied', 'Subscription past due. Please renew.', 403);

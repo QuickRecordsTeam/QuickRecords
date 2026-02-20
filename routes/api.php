@@ -47,6 +47,7 @@ Route::prefix('public/auth')->group(function () {
     Route::post('/validate/password-reset', [UserController::class, 'validateResetToken'])->middleware('isAuthorizedToAccessPlatform');
     Route::post('/reset-password', [UserController::class, 'resetPassword'])->middleware('isAuthorizedToAccessPlatform');
     Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware('isAuthorizedToCreateOrganisation');
+        Route::post('verify-client', [UserController::class, 'verifyClientAccount']);
 });
 
 Route::prefix('public/quickrecords/')->group(function () {
@@ -57,12 +58,13 @@ Route::middleware('isAuthorizedToSubscribe')->group(function () {
     Route::prefix('protected/init')->group(function () {
         Route::post('/subscriptions', [SubscriptionController::class, 'createSubscription']); //first subscription for the organisation, after this the user can access access the application. The payment must intercepted and either completed or set package set to trailing before the completion of this process
         Route::post('/client/subscriptions/{id}/payment-fee', [SubscriptionController::class, 'computeTotalSubscriptionAmount']);
-        Route::post('/client/subscriptions/{id}/initiate-payment', [PaymentController::class, 'initiatePayment']);
-        Route::get('/client/subscriptions/{id}/payment-status', [PaymentController::class, 'checkPaymentStatus']);
+        Route::post('/client/subscriptions/initiate-payment', [PaymentController::class, 'initiatePayment']);
+        Route::post('/client/subscriptions/payments/{id}/check-payment-status', [PaymentController::class, 'checkPaymentStatus']);
+        Route::post('/client/subscriptions/incomplete', [SubscriptionController::class, 'getClientIncompleteSubscription']);
     });
 });
 
-Route::post('/payment-callback', [PaymentController::class, 'handlePaymentCallback']);
+Route::post('/public/subscription/payment-callback', [PaymentController::class, 'handlePaymentCallback']);
 
 Route::middleware(['auth:sanctum', 'subscribed'])->group(function () {
 

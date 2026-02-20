@@ -46,4 +46,6 @@ interface UserManagementInterface {
 
     public function markAllNotificationsAsRead($request);
 
+    public function verifyClientAccount($request);
+
 }

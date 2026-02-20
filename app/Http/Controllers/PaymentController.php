@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\InitPaymentRequest;
 use App\Http\Requests\PaymentCallbackRequest;
 use App\Models\Payment;
-use App\Models\Subscription;
 use App\Services\SubscriptionPaymentService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
@@ -23,38 +22,39 @@ class PaymentController extends Controller
     public function filterPayments(Request $request)
     {
         $data = $this->paymentService->filterPayments($request);
-        return $this->successResponse($data, "Payments filtered successfully");
+        return $this->sendResponse($data, "Payments filtered successfully");
     }
 
 
     public function fetchClientPayments(Request $request)
     {
         $data = $this->paymentService->fetchClientPayments($request);
-        return $this->successResponse($data, "Client payments retrieved successfully");
+        return $this->sendResponse($data, "Client payments retrieved successfully");
     }
 
     public function initiatePayment(InitPaymentRequest $request)
     {
         $data = $this->paymentService->initiatePayment($request);
-        return $this->successResponse($data, "Payment initiated successfully");
+
+        return $this->sendResponse($data, "Payment initiated successfully");
     }
 
 
     public function showPayment(Payment $payment)
     {
         $data = $this->paymentService->getPayment($payment->id);
-        return $this->successResponse($data, "Payment details retrieved successfully");
+        return $this->sendResponse($data, "Payment details retrieved successfully");
     }
 
-    public function checkPaymentStatus($reference)
+    public function checkPaymentStatus($id)
     {
-        $data = $this->paymentService->checkPaymentStatus($reference);
-        return $this->successResponse($data, "Payment status retrieved successfully");
+        $data = $this->paymentService->checkPaymentStatus($id);
+        return $this->sendResponse($data, "Payment status retrieved successfully");
     }
 
     public function handlePaymentCallback(PaymentCallbackRequest $request)
     {
         $data = $this->paymentService->handlePaymentCallback($request);
-        return $this->successResponse($data, "Payment callback handled successfully");
+        return $this->sendResponse($data, "Payment callback handled successfully");
     }
 }

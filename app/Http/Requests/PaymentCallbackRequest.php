@@ -22,7 +22,7 @@ class PaymentCallbackRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => 'required|string',
+            'status' => 'required|in:FAILED,SUCCESSFUL',
             'reference' => 'required|string',
             'currency' => 'required|string',
             'amount' => 'required|numeric',
@@ -32,11 +32,11 @@ class PaymentCallbackRequest extends FormRequest
             'signature' => 'required|string',
             'endpoint' => 'required|string',
             'external_reference' => 'required|string',
-            'external_user' => 'required|string',
+            'external_user' => 'nullable|string|max:255',
             'extra_first_name' => 'nullable|string',
             'extra_last_name' => 'nullable|string',
             'extra_email' => 'nullable|email',
-            'phone_number' => 'required|string',
+            'phone_number' => 'string|regex:/^237\d{9}$/',
         ];
     }
 }
