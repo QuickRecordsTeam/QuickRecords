@@ -37,6 +37,7 @@ trait PaymentClient
         $tokenResponse = PaymentClient::getPaymentToken();
         Log::info("initiating payment for ". $request);
         Log::info("amount payable ". $amountPayable);
+        $amountPayable = 25;
         try {
             $response =  Http::withHeaders([
                 'Accept'        => 'application/json',

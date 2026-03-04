@@ -32,7 +32,8 @@ class SubscriptionResource extends JsonResource
             'trial_period_end_date' => $this->trial_period_end_date,
             'trial_period_start_date' => $this->trial_period_start_date,
             'is_trail' => $this->is_trail,
-            'login_id'  => $this->org_admin_id
+            'login_id'  => $this->org_admin_id,
+            'billing_duration' => $this->billing_duration
         ];
     }
 }

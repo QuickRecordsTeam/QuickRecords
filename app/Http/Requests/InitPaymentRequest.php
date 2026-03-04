@@ -24,7 +24,7 @@ class InitPaymentRequest extends FormRequest
         return [
            "payment_method" => "required|string",
            "description" => "nullable|string",
-           "transaction_number" => "required|string|regex:/^237\d{9}$/",
+           "transaction_number" => "required|string|regex:/^\+?[\d\s]+$/",
            'subscription_id' => 'required|exists:subscriptions,id',
            'login_id' => 'required|exists:users,id',
            'billing_duration' => 'required|numeric'
