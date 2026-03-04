@@ -27,6 +27,14 @@ class ClientVerificationResource extends JsonResource
             'organisation_id'      =>  isset($this->resource->organisation) ? $this->resource->organisation->id : null,
             'organisation_name'      =>  isset($this->resource->organisation) ? $this->resource->organisation->name : null,
             'organisation_email'      =>  isset($this->resource->organisation) ? $this->resource->organisation->email : null,
+            'organisation_telephone'      =>  isset($this->resource->organisation) ? $this->resource->organisation->telephone : null,
+            'organisation_address'      =>  isset($this->resource->organisation) ? $this->resource->organisation->address : null,
+            'organisation_salutation'      =>  isset($this->resource->organisation) ? $this->resource->organisation->salutation : null,
+            'organisation_region'      =>  isset($this->resource->organisation) ? $this->resource->organisation->region : null,
+            'organisation_box_number'      =>  isset($this->resource->organisation) ? $this->resource->organisation->box_number : null,
+            'organisation_logo'      =>  isset($this->resource->organisation) ? $this->resource->organisation->logo : null,
+            'organisation_description'      =>  isset($this->resource->organisation) ? $this->resource->organisation->description : null,
+
             'subscriptions' => (isset($this->resource->organisation)) ? SubscriptionResource::collection($this->resource->organisation->subscriptions) : []
 
         ];

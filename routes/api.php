@@ -61,6 +61,7 @@ Route::middleware('isAuthorizedToSubscribe')->group(function () {
         Route::post('/client/subscriptions/initiate-payment', [PaymentController::class, 'initiatePayment']);
         Route::post('/client/subscriptions/payments/{id}/check-payment-status', [PaymentController::class, 'checkPaymentStatus']);
         Route::post('/client/subscriptions/incomplete', [SubscriptionController::class, 'getClientIncompleteSubscription']);
+         Route::post('/subscriptions/trial', [SubscriptionController::class, 'getActivateSubscriptionTrial']);
     });
 });
 

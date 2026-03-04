@@ -35,7 +35,8 @@ trait PaymentClient
     {
         $url = config('app.payment_gateway_api_url') . '/collect';
         $tokenResponse = PaymentClient::getPaymentToken();
-
+        Log::info("initiating payment for ". $request);
+        Log::info("amount payable ". $amountPayable);
         try {
             $response =  Http::withHeaders([
                 'Accept'        => 'application/json',

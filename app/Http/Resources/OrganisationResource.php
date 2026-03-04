@@ -3,15 +3,19 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Ramsey\Uuid\Uuid;
+
 
 class OrganisationResource extends JsonResource
 {
     private $org_admin_user_id;
-    public function __construct($resource, $org_admin_user_id = null)
+    private $adminUsername;
+    private $adminName;
+    public function __construct($resource, $org_admin_user_id = null, $adminUsername = null, $adminName = null)
     {
         parent::__construct($resource);
         $this->org_admin_user_id = $org_admin_user_id;
+        $this->adminName = $adminName;
+        $this->adminUsername = $adminUsername;
     }
     /**
      * Transform the resource into an array.
@@ -35,7 +39,9 @@ class OrganisationResource extends JsonResource
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,
             'user_id'       => $this->org_admin_user_id,
-            'subscriptions' => SubscriptionResource::collection($this->subscriptions)
+            'subscriptions' => SubscriptionResource::collection($this->subscriptions),
+            'adminName'     => $this->adminName,
+            'adminUsername' => $this->adminUsername
         ];
     }
 }

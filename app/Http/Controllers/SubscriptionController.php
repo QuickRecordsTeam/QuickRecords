@@ -42,6 +42,13 @@ class SubscriptionController extends Controller
         return $this->sendResponse($data, 'Subscription created successfully');
     }
 
+    public function getActivateSubscriptionTrial(SubscriptionRequest $request)
+    {
+        $data = $this->subscriptionService->createSubscription($request);
+
+        return $this->sendResponse($data, 'Subscription trial activated successfully');
+    }
+
     public function showSubscription($id)
     {
         $data = $this->subscriptionService->getSubscription($id);

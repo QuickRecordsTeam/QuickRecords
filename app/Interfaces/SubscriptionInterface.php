@@ -13,4 +13,5 @@ interface SubscriptionInterface
     public function deleteClientSubscription($id, $request);
     public function computeTotalSubscriptionAmount($subscriptionId, $request);
     public function getClientIncompleteSubscription($request);
+    public function getActivateSubscriptionTrial($request);
 }

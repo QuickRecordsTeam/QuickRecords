@@ -40,7 +40,7 @@ class SubscriptionPaymentService implements PaymentInterface
             if (!$subscription) {
                 throw new \App\Exceptions\BusinessValidationException('Subscription not found for the organisation', 404);
             }
-            $amountPayable = $this->getTotalAmountPayable($subscription->id, $user->organisation->id);
+            $amountPayable = ($this->getTotalAmountPayable($subscription->id, $user->organisation->id) * $request->input('billing_duration'));
 
             $subPayment = Payment::create([
                 'subscription_id' => $subscription->id,
@@ -56,6 +56,9 @@ class SubscriptionPaymentService implements PaymentInterface
             $subPayment->update([
                 'transaction_id' => $initResponse->json('reference'),
             ]);
+
+            $subscription->billing_duration = $request->input('billing_duration');
+            $subscription->save();
 
             return new InitPaymentResource($initResponse, $initResponse->json('reference') ?? null, $initResponse->json('ussd_code'));
         });
@@ -83,8 +86,8 @@ class SubscriptionPaymentService implements PaymentInterface
             $subscription = $initiatedPayment->subscription()->first();
             $subscription->update([
                 'status' => 'active',
-                'current_period_start_date' => now(),
-                'current_period_end_date' => now()->addMonth(),
+                'current_period_start_date' => $this->getSubscriptionDuration($subscription->subscriptionPlan, $subscription->billing_duration)['current_period_start_date'],
+                'current_period_end_date' => $this->getSubscriptionDuration($subscription->subscriptionPlan, $subscription->billing_duration)['current_period_end_date'],
                 'trial_period_start_date' => null,
                 'trial_period_end_date' => null,
             ]);
@@ -109,8 +112,8 @@ class SubscriptionPaymentService implements PaymentInterface
             $subscription = $initiatedPayment->subscription()->first();
             $subscription->update([
                 'status' => 'active',
-                'current_period_start_date' => $this->getSubscriptionDuration($subscription->subscriptionPlan)['current_period_start_date'],
-                'current_period_end_date' => $this->getSubscriptionDuration($subscription->subscriptionPlan)['current_period_end_date'],
+                'current_period_start_date' => $this->getSubscriptionDuration($subscription->subscriptionPlan, $subscription->billing_duration)['current_period_start_date'],
+                'current_period_end_date' => $this->getSubscriptionDuration($subscription->subscriptionPlan, $subscription->billing_duration)['current_period_end_date'],
                 'trial_period_start_date' => null,
                 'trial_period_end_date' => null,
             ]);
@@ -163,10 +166,10 @@ class SubscriptionPaymentService implements PaymentInterface
         return round($subscriptionAmount);
     }
 
-    private function getSubscriptionDuration($subscription_plan)
+    private function getSubscriptionDuration($subscription_plan, $billing_duration)
     {
         $start = BillingCyclePlans::MONTHLY === $subscription_plan->billing_cycle ? \Carbon\Carbon::now()->startOfDay() : \Carbon\Carbon::now()->startOfYear();
-        $end = BillingCyclePlans::MONTHLY === $subscription_plan->billing_cycle ? \Carbon\Carbon::now()->addMonths(1) : \Carbon\Carbon::now()->addYears(1);
+        $end = BillingCyclePlans::MONTHLY === $subscription_plan->billing_cycle ? \Carbon\Carbon::now()->addMonths($billing_duration) : \Carbon\Carbon::now()->addYears($billing_duration);
         return [
             'current_period_start_date' => $start,
             'current_period_end_date' => $end

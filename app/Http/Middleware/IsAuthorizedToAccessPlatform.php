@@ -25,11 +25,11 @@ class IsAuthorizedToAccessPlatform
             ->first();
 
         if (!$user) {
-            return ResponseTrait::sendError('Access denied', 'You are not authorized to login', 403);
+            return ResponseTrait::sendError('Access denied', 'Unauthorized! Invalid Account', 403);
         }
 
         if ($user->status === SessionStatus::IN_ACTIVE) {
-            return ResponseTrait::sendError("User's Account has been deactivated! Please contact the ADMIN or President", 401);
+            return ResponseTrait::sendError("User's Account has been deactivated! Please contact the Admin or President", 401);
         }
 
         $allowedRoles = ['ADMIN', 'PRESIDENT', 'FINANCIAL_SECRETARY', 'TREASURER', 'AUDITOR', 'SYSTEM_ADMIN'];

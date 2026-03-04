@@ -27,6 +27,7 @@ class InitPaymentRequest extends FormRequest
            "transaction_number" => "required|string|regex:/^237\d{9}$/",
            'subscription_id' => 'required|exists:subscriptions,id',
            'login_id' => 'required|exists:users,id',
+           'billing_duration' => 'required|numeric'
         ];
     }
 }

@@ -24,7 +24,8 @@ class Subscription extends Model
         'status',
         'trial_period_end_date',
         'trial_period_start_date',
-        'is_trail'
+        'is_trail',
+        'billing_duration'
 
     ];
     public function organisation()

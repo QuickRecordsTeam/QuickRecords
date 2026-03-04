@@ -22,29 +22,71 @@ class SubscriptionService implements SubscriptionInterface
         if (is_null($subscription_plan)) {
             throw new \App\Exceptions\BusinessValidationException('Invalid subscription plan selected', 400);
         }
-        if(!$organisation){
+        if (!$organisation) {
             throw new BusinessValidationException("Organisation not found", 404);
         }
 
         $active_sub = $organisation->subscriptions()->where('status', 'active')->first();
 
-        if($active_sub){
+        if ($active_sub) {
             throw new BusinessValidationException("The Organisation currently have an active subscription", 400);
         }
 
-        $subscription = Subscription::create([
-            'organisation_id' => $organisation->id,
-            'subscription_plan_id' => $subscription_plan->id,
-            'auto_renewal' => $request->auto_renewal,
-            'is_trail' => $request->auto_renewal ? false : $request->is_trail,
-            'current_period_start_date' => null,
-            'current_period_end_date' => null,
-            'trial_period_start_date' => $request->is_trail ? $this->getTrailDuration()['trial_period_start_date'] : null,
-            'trial_period_end_date' => $request->is_trail ? $this->getTrailDuration()['trial_period_end_date'] : null,
-            'status' => $request->is_trail ? 'trialing' : 'incomplete',
-            'auto_renewal' => $request->auto_renewal,
-            'referral_code_discount' => $request->referral_code ? $this->calculateReferralDiscount($subscription_plan->price, $request->referral_code, $organisation) : 0,
-        ]);
+        $subscription = Subscription::updateOrCreate(
+            [
+                'organisation_id' => $organisation->id,
+                'subscription_plan_id' => $subscription_plan->id,
+                'status' => 'incomplete'
+            ],
+            [
+                'organisation_id' => $organisation->id,
+                'subscription_plan_id' => $subscription_plan->id,
+                'auto_renewal' => $request->auto_renewal,
+                'is_trail' => $request->auto_renewal ? false : $request->is_trail,
+                'current_period_start_date' => null,
+                'current_period_end_date' => null,
+                'trial_period_start_date' => $request->is_trail ? $this->getTrailDuration()['trial_period_start_date'] : null,
+                'trial_period_end_date' => $request->is_trail ? $this->getTrailDuration()['trial_period_end_date'] : null,
+                'status' => $request->is_trail ? 'trialing' : 'incomplete',
+
+                'referral_code_discount' => $request->referral_code ? $this->calculateReferralDiscount($subscription_plan->price, $request->referral_code, $organisation) : 0,
+            ]
+        );
+
+        return new SubscriptionResource($subscription, $request['login_id']);
+    }
+
+    public function getActivateSubscriptionTrial($request)
+    {
+        $subscription_plan = SubscriptionPlan::where('id', $request->subscription_plan_id)->where('status', true)->first();
+        $organisation = Organisation::find($request->organisation_id);
+
+        if (is_null($subscription_plan)) {
+            throw new \App\Exceptions\BusinessValidationException('Invalid subscription plan selected', 400);
+        }
+        if (!$organisation) {
+            throw new BusinessValidationException("Organisation not found", 404);
+        }
+
+        $trial_sub = $organisation->subscriptions()->where('is_trail', true)->first();
+
+        if ($trial_sub) {
+            throw new BusinessValidationException("The Organisation currently have a trial subscription", 400);
+        }
+        $subscription = Subscription::create(
+            [
+                'organisation_id' => $organisation->id,
+                'subscription_plan_id' => $subscription_plan->id,
+                'auto_renewal' => false,
+                'is_trail' => true,
+                'current_period_start_date' => null,
+                'current_period_end_date' => null,
+                'trial_period_start_date' => $this->getTrailDuration()['trial_period_start_date'],
+                'trial_period_end_date' => $this->getTrailDuration()['trial_period_end_date'],
+                'status' => 'trialing',
+                'referral_code_discount' =>  0,
+            ]
+        );
 
         return new SubscriptionResource($subscription, $request['login_id']);
     }
@@ -132,12 +174,11 @@ class SubscriptionService implements SubscriptionInterface
             $totalAmount = (float) $subscription->subscriptionPlan->price - ((float)$subscription->subscriptionPlan->price * ((float)$subscription->subscriptionPlan->discount_percentage / 100));
         }
 
-
-
-
         if ((float) $subscription->referral_code_discount > 0) {
             $totalAmount = $totalAmount > 0 ? $totalAmount - (float) $subscription->referral_code_discount : (float) $subscription->subscriptionPlan->price - (float) $subscription->referral_code_discount;
         }
+
+        $totalAmount = $totalAmount * $subscription->billing_duration;
 
         return ["subscription" => $subscription, "totalAmount" => max(round($totalAmount, 2), 0), "chargeable_fee" => (int) config('app.payment_charge_fee_percentage')];
     }
@@ -145,7 +186,7 @@ class SubscriptionService implements SubscriptionInterface
     public function getClientIncompleteSubscription($request)
     {
         $user = User::find('id', $request['login_id'])->first();
-        if(!$user){
+        if (!$user) {
             throw new BusinessValidationException("Invalid account or user", 403);
         }
         $subscriptions = $user->organisation->subscriptions('status', 'incomplete')->get();

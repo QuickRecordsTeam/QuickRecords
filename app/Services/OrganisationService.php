@@ -33,10 +33,14 @@ class OrganisationService implements OrganisationInterface
     {
 
         $user = User::where('id', $request['account_id'])->first();
-        if(is_null($user)) {
+        if (is_null($user)) {
             throw new BusinessValidationException('User account does not exist', 403);
         }
-        $organisation = Organisation::create([
+        $organisation = Organisation::firstOrCreate(
+            [
+                'id' => $request['id']
+            ],
+            [
                 'name'             => $request->name,
                 'email'            => $request->email,
                 'telephone'        => $request->telephone,
@@ -47,13 +51,14 @@ class OrganisationService implements OrganisationInterface
                 'created_by'       => $user->id,
                 'region'           => $request->region,
                 'referral_code'    => $this->generateReferralCode(),
-            ]);
+            ]
+        );
 
-            $user->update([
-                'organisation_id' => $organisation->id
-            ]);
+        $user->update([
+            'organisation_id' => $organisation->id
+        ]);
 
-        return new OrganisationResource($organisation, $user->id);
+        return new OrganisationResource($organisation, $user->id, $user->username, $user->name);
     }
 
     public function getOrganisation($id)
