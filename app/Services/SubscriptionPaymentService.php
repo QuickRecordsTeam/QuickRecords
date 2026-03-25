@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Constants\BillingCyclePlans;
 use App\Constants\PaymentStatus;
+use App\Events\PaymentStatusUpdated;
 use App\Exceptions\BusinessValidationException;
 use App\Http\Resources\InitPaymentResource;
 use App\Http\Resources\PaymentResource;
@@ -96,30 +97,39 @@ class SubscriptionPaymentService implements PaymentInterface
     }
     public function handlePaymentCallback($request)
     {
-        $initiatedPayment = Payment::where('id', $request->external_reference)->where('transaction_id', $request->reference)->first();
-        if (!$initiatedPayment) {
-            throw new BusinessValidationException('Invalid payment request', 403);
-        }
-        $initiatedPayment->update([
-            'transaction_status' => $request->status,
-            'external_transaction_id' => $request->code,
-            'financial_transaction_id' => $request->operator_reference,
-            'transaction_type' => $request->endpoint,
-            'payment_method'   => $request->operator
-        ]);
+        // $transaction_id = $request->reference;
+        // $status = $request->status;
+        // $initiatedPayment = Payment::where('id', $request->external_reference)->where('transaction_id', $transaction_id)->first();
+        // if (!$initiatedPayment) {
+        //     throw new BusinessValidationException('Invalid payment request', 403);
+        // }
+        // $initiatedPayment->update([
+        //     'transaction_status' => $request->status,
+        //     'external_transaction_id' => $request->code,
+        //     'financial_transaction_id' => $request->operator_reference,
+        //     'transaction_type' => $request->endpoint,
+        //     'payment_method'   => $request->operator
+        // ]);
 
-        if ($request->status === PaymentStatus::SUCCESSFUL) {
-            $subscription = $initiatedPayment->subscription()->first();
-            $subscription->update([
-                'status' => 'active',
-                'current_period_start_date' => $this->getSubscriptionDuration($subscription->subscriptionPlan, $subscription->billing_duration)['current_period_start_date'],
-                'current_period_end_date' => $this->getSubscriptionDuration($subscription->subscriptionPlan, $subscription->billing_duration)['current_period_end_date'],
-                'trial_period_start_date' => null,
-                'trial_period_end_date' => null,
-            ]);
+        // if ($status === PaymentStatus::SUCCESSFUL) {
+        //     $subscription = $initiatedPayment->subscription()->first();
+        //     $subscription->update([
+        //         'status' => 'active',
+        //         'current_period_start_date' => $this->getSubscriptionDuration($subscription->subscriptionPlan, $subscription->billing_duration)['current_period_start_date'],
+        //         'current_period_end_date' => $this->getSubscriptionDuration($subscription->subscriptionPlan, $subscription->billing_duration)['current_period_end_date'],
+        //         'trial_period_start_date' => null,
+        //         'trial_period_end_date' => null,
+        //     ]);
+        // }
+        $user = User::find("a4b419b5-7bf7-4233-b0f5-6805dd1ee0b3");
+        try {
+            broadcast(new PaymentStatusUpdated($user, "321c173d-fbc0-4741-b6a1-1b3c4ca2d3b7", "77433ef3-a060-4779-95f6-7ac2c18fe722"));
+           logger()->info("success");
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
         }
 
-        return new PaymentResource($initiatedPayment->fresh());
+        // return new PaymentResource($initiatedPayment->fresh());
     }
     public function filterPayments($request)
     {

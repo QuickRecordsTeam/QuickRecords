@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Constants\Roles;
-use App\Models\CustomRole;
 use App\Traits\ResponseTrait;
 use Closure;
 

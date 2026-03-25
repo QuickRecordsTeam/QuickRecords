@@ -54,7 +54,7 @@ class PaymentController extends Controller
 
     public function handlePaymentCallback(PaymentCallbackRequest $request)
     {
-        $data = $this->paymentService->handlePaymentCallback($request);
-        return $this->sendResponse($data, "Payment callback handled successfully");
+        $this->paymentService->handlePaymentCallback($request);
+        return $this->sendResponse("Payment proceed handled successfully", 200);
     }
 }

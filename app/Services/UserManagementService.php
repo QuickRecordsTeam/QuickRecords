@@ -33,8 +33,7 @@ use App\Traits\HelpTrait;
 use App\Traits\ResponseTrait;
 use Carbon\Carbon;
 use Exception;
-
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -244,6 +243,10 @@ class UserManagementService implements UserManagementInterface
             'username'   => str_replace(" ", "", $request->username),
             'email_verified_at' => Carbon::now()->toDateTimeString()
         ]);
+
+        Auth::login($user);
+
+        $request->session()->regenerate();
 
         return new CreateAccountResource($user, $user->username, $user->email, $user->id);
     }

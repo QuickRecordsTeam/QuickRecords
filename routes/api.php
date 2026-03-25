@@ -25,6 +25,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSavingController;
 use Illuminate\Support\Facades\Route;
 
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -35,7 +37,10 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+Route::post('/broadcasting/auth', function (Request $request) {
+    logger()->info('Auth User Check:', ['user' => auth('sanctum')->user()]);
+    return Broadcast::auth($request);
+})->middleware('auth:sanctum');
 
 
 Route::prefix('public/auth')->group(function () {
