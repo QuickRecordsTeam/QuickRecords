@@ -11,8 +11,11 @@ use App\Constants\SessionStatus;
 use App\Exceptions\BusinessValidationException;
 use App\Exceptions\EmailException;
 use App\Exceptions\UnAuthorizedException;
+use App\Http\Resources\ClientVerificationResource;
+use App\Http\Resources\CreateAccountResource;
 use App\Http\Resources\MemberInviteNotification;
 use App\Http\Resources\PasswordResetResponse;
+use App\Http\Resources\SubscriptionResource;
 use App\Http\Resources\TokenResource;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
@@ -30,8 +33,7 @@ use App\Traits\HelpTrait;
 use App\Traits\ResponseTrait;
 use Carbon\Carbon;
 use Exception;
-
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -207,7 +209,8 @@ class UserManagementService implements UserManagementInterface
         $currentSession = $this->session_service->getCurrentSession();
         $token = $this->generateToken($user);
 
-        return new TokenResource(new UserResource($updated, $token, true), $currentSession);
+        $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+        return new TokenResource(new UserResource($updated, $token, true), $currentSession, new SubscriptionResource($active_subscription));
     }
 
     public function deleteUser($user_id)
@@ -218,26 +221,34 @@ class UserManagementService implements UserManagementInterface
     public function loginUser($request)
     {
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = $request->attributes->get('user');
         if (!Hash::check($request->password, $user->password)) {
             throw new UnAuthorizedException('Bad Credentials', 403);
         } else {
-            $this->validateIfUserCanLogin($user);
             $token = $this->generateToken($user);
             $hasLoginBefore = $this->checkIfUserHasLogin($user);
             $currentSession = $this->session_service->getCurrentSession();
-            return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession);
+            $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+            return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession, new SubscriptionResource($active_subscription));
         }
     }
 
     public function createAccount($request)
     {
-        return User::create([
+        $user = User::create([
             'name'       => $request->name,
             'telephone'  => str_replace(" ", "", $request->telephone),
             'password'   => Hash::make($request->password),
             'email'      => $request->email,
+            'username'   => str_replace(" ", "", $request->username),
+            'email_verified_at' => Carbon::now()->toDateTimeString()
         ]);
+
+        Auth::login($user);
+
+        $request->session()->regenerate();
+
+        return new CreateAccountResource($user, $user->username, $user->email, $user->id);
     }
 
     public function setPassword($request)
@@ -253,8 +264,8 @@ class UserManagementService implements UserManagementInterface
         $token = $this->generateToken($user);
         $hasLoginBefore = $this->checkIfUserHasLogin($user);
         $currentSession = $this->session_service->getCurrentSession();
-
-        return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession);
+        $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+        return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession, new SubscriptionResource($active_subscription));
     }
 
     public function updatePassword($request)
@@ -362,7 +373,6 @@ class UserManagementService implements UserManagementInterface
             'email'  => 'required|email'
         ]);
         $user = User::where('email', $request->email)->firstOrFail();
-        $this->validateIfUserCanLogin($user);
         $token = $this->generateSecurityToken(7);
         $redirectLink = env('PASSWORD_RESET_UI_REDIRECT_LINK') . $this->generateSecurityToken(20);
         $organisation_logo = $user->organisation->logo;
@@ -407,7 +417,6 @@ class UserManagementService implements UserManagementInterface
                 throw new UnAuthorizedException("Password Reset token has Expired", 403);
             }
             $user = User::findOrFail($request->user_id);
-            $this->validateIfUserCanLogin($user);
             $user->password = Hash::make($request->new_password);
             $user->save();
 
@@ -420,7 +429,8 @@ class UserManagementService implements UserManagementInterface
             } catch (Exception $exception) {
                 throw new EmailException("Could not send reset email link", 550);
             }
-            return new TokenResource(new UserResource($user, $token, true), $currentSession);
+            $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+            return new TokenResource(new UserResource($user, $token, true), $currentSession, new SubscriptionResource($active_subscription));
         } else {
             throw new UnAuthorizedException("Invalid token", 403);
         }
@@ -466,6 +476,19 @@ class UserManagementService implements UserManagementInterface
         foreach ($request->all() as $key => $value) {
             MemberInvitation::findOrFail($value['id'])->update(['has_seen_notification' => true]);
         }
+    }
+
+    public function verifyClientAccount($request)
+    {
+        $user = User::where('username', $request->input('username'))->first();
+        if (!$user) {
+            throw new BusinessValidationException("User account not found", 404);
+        }
+        if (!Hash::check($request->password, $user->password)) {
+            throw new BusinessValidationException("User account not found", 403);
+        }
+
+        return new ClientVerificationResource($user);
     }
     private function generateToken($user)
     {

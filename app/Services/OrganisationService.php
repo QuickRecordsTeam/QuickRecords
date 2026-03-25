@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Exceptions\BusinessValidationException;
+use App\Http\Resources\OrganisationResource;
 use App\Interfaces\OrganisationInterface;
 use App\Models\Organisation;
 use App\Models\User;
@@ -9,30 +11,10 @@ use Illuminate\Support\Facades\Auth;
 
 class OrganisationService implements OrganisationInterface
 {
-    public function createOrganisation($request)
+    public function updateOrganisationInfo($request)
     {
-
-        $user = User::findOrFail(Auth::user()['id']);
-
         $organisation = Organisation::find($request->id);
-        if (is_null($organisation)) {
-            $saved = Organisation::create([
-                'name'             => $request->name,
-                'email'            => $request->email,
-                'telephone'        => $request->telephone,
-                'description'      => $request->description,
-                'address'          => $request->address,
-                'salutation'       => $request->salutation,
-                'box_number'       => $request->box_number,
-                'region'           => $request->region,
-                'updated_by'       => $request->user()->name,
-            ]);
-            $user->update([
-                'organisation_id' => $saved->id,
-                'updated_by'      => $request->user()->name
-            ]);
-            $save_organ = $saved;
-        } else {
+        if (!is_null($organisation)) {
             $organisation->name             = $request->name;
             $organisation->email            = $request->email;
             $organisation->telephone        = $request->telephone;
@@ -43,11 +25,40 @@ class OrganisationService implements OrganisationInterface
             $organisation->updated_by       = $request->user()->name;
 
             $organisation->save();
-
-            $save_organ = $organisation;
         }
+        return $organisation;
+    }
 
-        return $save_organ;
+    public function createOrganisationAccount($request)
+    {
+
+        $user = User::where('id', $request['account_id'])->first();
+        if (is_null($user)) {
+            throw new BusinessValidationException('User account does not exist', 403);
+        }
+        $organisation = Organisation::firstOrCreate(
+            [
+                'id' => $request['id']
+            ],
+            [
+                'name'             => $request->name,
+                'email'            => $request->email,
+                'telephone'        => $request->telephone,
+                'description'      => $request->description,
+                'address'          => $request->address,
+                'salutation'       => $request->salutation,
+                'box_number'       => $request->box_number,
+                'created_by'       => $user->id,
+                'region'           => $request->region,
+                'referral_code'    => $this->generateReferralCode(),
+            ]
+        );
+
+        $user->update([
+            'organisation_id' => $organisation->id
+        ]);
+
+        return new OrganisationResource($organisation, $user->id, $user->username, $user->name);
     }
 
     public function getOrganisation($id)
@@ -58,7 +69,7 @@ class OrganisationService implements OrganisationInterface
     public function getOrganisationInfo()
     {
         $id = null;
-        if(!is_null(Auth::user()->organisation)){
+        if (!is_null(Auth::user()->organisation)) {
             $id = Auth::user()->organisation->id;
         }
         return Organisation::findOrFail($id);
@@ -90,5 +101,16 @@ class OrganisationService implements OrganisationInterface
         $organisation->update([
             'telephone' => $request->telephone
         ]);
+    }
+
+    public function generateReferralCode($length = 4)
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $charactersLength = strlen($characters);
+        $referralCode = 'REF-';
+        for ($i = 0; $i < $length; $i++) {
+            $referralCode .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $referralCode;
     }
 }

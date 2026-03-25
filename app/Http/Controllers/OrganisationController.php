@@ -19,9 +19,16 @@ class OrganisationController extends Controller
 
     public function createOrganisation(CreateOrganisationRequest $request)
     {
-        $data = $this->organisation_service->createOrganisation($request);
+        $data = $this->organisation_service->updateOrganisationInfo($request);
 
         return $this->sendResponse($data, 'Organisation created successfully' );
+    }
+
+     public function createOrganisationAccount(CreateOrganisationRequest $request)
+    {
+        $data = $this->organisation_service->createOrganisationAccount($request);
+
+        return $this->sendResponse($data, 'Organisation created successfully');
     }
 
     public function getOrganisation($id)

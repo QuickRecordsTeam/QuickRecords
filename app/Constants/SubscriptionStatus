@@ -1,0 +1,12 @@
+<?php
+namespace App\Constants;
+
+class SubscriptionStatus
+{
+    public const ACTIVE = 'active';
+    public const INACTIVE = 'inactive';
+    public const CANCELLED = 'cancelled';
+    public const INCOMPLETE = 'incomplete';
+    public const PAST_DUE = 'past_due';
+    public const TRIALING = 'trialing';
+}

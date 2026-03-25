@@ -4,7 +4,7 @@ namespace App\Interfaces;
 
 interface OrganisationInterface {
 
-    public function createOrganisation($request);
+    public function updateOrganisationInfo($request);
     public function getOrganisation($id);
     public function getOrganisationInfo();
     public function updatedOrganisation($request, $id);
@@ -12,4 +12,5 @@ interface OrganisationInterface {
     public function getOrganisations();
 
     public function updateTelephoneNumber($request);
+    public function createOrganisationAccount($request);
 }

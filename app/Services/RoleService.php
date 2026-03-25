@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Constants\Roles;
 use App\Exceptions\BusinessValidationException;
 use App\Http\Resources\RoleResource;
 use App\Models\User;
@@ -21,7 +22,7 @@ class RoleService implements RoleInterface
     {
         $user = User::findOrFail($user_id);
         $assignRole = CustomRole::findByName($role, 'api');
-        $member_has_role = $this->checkIfRoleCanBeAdded($assignRole);
+        $member_has_role =  Roles::MEMBER == $assignRole->name ? false :  $this->checkIfRoleCanBeAdded($assignRole);
 
         if (!$member_has_role) {
             $this->saveUserRole($user, $assignRole, $updated_by);
@@ -84,7 +85,6 @@ class RoleService implements RoleInterface
             ->where('roles.name', $assign_role->name)
             ->count();
         return $assign_role->number_of_members == $users;
-
     }
 
     private function getAssignedRole($role_id, $model_id)

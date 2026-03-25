@@ -12,6 +12,7 @@ use App\Http\Middleware\IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin;
 use App\Http\Middleware\isPresidentMiddleware;
 use App\Http\Middleware\IsPresidentOrIsAdmin;
 use App\Http\Middleware\isPresidentOrisFinancialSecretary;
+use App\Http\Middleware\IsSystemAdminMiddleware;
 use App\Http\Middleware\IsTreasurerMiddleware;
 use App\Http\Middleware\IsTreasurerOrIsFinancialSecretary;
 use App\Http\Middleware\IsTreasurerOrIsFinancialSecretaryOrIsPresident;
@@ -46,18 +47,18 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            // \Illuminate\Session\Middleware\AuthenticateSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+           \App\Http\Middleware\EncryptCookies::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \App\Http\Middleware\VerifyCsrfToken::class, // Web has this by default
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
         'api' => [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:60,1',
+            \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -98,7 +99,13 @@ class Kernel extends HttpKernel
         'IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin' => IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin::class,
         'isPresidentOrIsAdmin' => IsPresidentOrIsAdmin::class,
         'isAdminIsPresidentIsFinancialSecretary' => IsAdminIsPresidentIsFinancialSecretary::class,
-        'IsAdminOrIsTreasurer' => IsAdminOrIsTreasurer::class
+        'IsAdminOrIsTreasurer' => IsAdminOrIsTreasurer::class,
+        'isSystemAdmin' => IsSystemAdminMiddleware::class,
+        'subscribed' => \App\Http\Middleware\SubscriptionMiddleware::class,
+        'isAuthorizedToAccessPlatform' => \App\Http\Middleware\IsAuthorizedToAccessPlatform::class,
+        'isAuthorizedToCreateOrganisation' => \App\Http\Middleware\IsAuthorizedToCreateOrganisation::class,
+        'isAuthorizedToSubscribe' => \App\Http\Middleware\IsAuthorizedToSubscribe::class,
+
 
     ];
 }

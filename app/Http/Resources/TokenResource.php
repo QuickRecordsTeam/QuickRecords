@@ -8,19 +8,22 @@ class TokenResource extends JsonResource
 {
     private $user_data;
     private $current_session;
+    private $subscription;
 
-    public function __construct($user_data, $current_session)
+    public function __construct($user_data, $current_session, $subscription)
     {
         parent::__construct(null);
         $this->user_data = $user_data;
         $this->current_session = $current_session;
+        $this->subscription = $subscription;
     }
 
     public function toArray($request)
     {
         return [
             'user_data' => $this->user_data,
-            'current_session' => $this->current_session
+            'current_session' => $this->current_session,
+            'subscription'      => $this->subscription
         ];
     }
 }

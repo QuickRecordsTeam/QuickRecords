@@ -27,7 +27,8 @@ class CreateAccountRequest extends FormRequest
             'name'            => 'required|max:255|min:4',
             'telephone'       => 'required|string|unique:users,telephone',
             'password'        => 'required|confirmed|min:8',
-            'email'           => 'required|email|unique:users,email',
+            'email'           => 'nullable|email|unique:users,email',
+            'username'        => 'required|string|unique:users,username|min:4|max:30|regex:/^\S+$/',
         ];
     }
 }

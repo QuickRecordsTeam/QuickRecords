@@ -14,18 +14,21 @@ class OrganisationSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
-        Organisation::create([
-            'id'            => Str::uuid()->toString(),
-            'name'          => "QuickRecords",
-            'email'         => "support@quickrecords.com",
-            'region'        => "Southwest",
-            'telephone'     => "+237683404289",
-            'address'       => "Buea",
-            'description'   => "Streamlinning Finance Management within an Organisation, Church, Group or Business",
-            'logo'          => "",
-            'salutation'    => "Streamlining Finance Management with Innovative Technology",
-            'box_number'    => 1523,
-            'updated_by'    => "Admin"
-        ]);
+       for ($i = 0; $i < 10; $i++) {
+            Organisation::create([
+                'id'            => Str::uuid()->toString(),
+                'name' => $faker->company,
+                'description' => $faker->paragraph,
+                'email' => $faker->companyEmail,
+                'telephone' => $faker->phoneNumber,
+                'address' => $faker->address,
+                'region' => $faker->state,
+                'box_number' => $faker->randomNumber(5),
+                'logo' => $faker->imageUrl(200, 200, 'business'),
+                'salutation' => $faker->catchPhrase,
+                'updated_by' => $faker->name,
+                'referral_code' => $faker->unique()->bothify('REF-#####') // Generate a unique referral code
+            ]);
+        }
     }
 }

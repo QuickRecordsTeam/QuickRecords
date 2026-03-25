@@ -1,13 +1,15 @@
 <?php
+
 namespace App\Constants;
 
-class Permissions {
+class Permissions
+{
     public const CAN_CREATE_ORGANISATION = 'create-organisation';
     public const CAN_UPDATE_ORGANISATION = 'update-organisation';
     public const CAN_GET_ORGANISATION = 'get-organisation';
     public const CAN_DELETE_ORGANISATION = 'delete-organisation';
 
-    public const CAN_ASSIGN_USER_ROLE ='assign-user-role';
+    public const CAN_ASSIGN_USER_ROLE = 'assign-user-role';
     public const CAN_REMOVE_USER_ROLE = 'remove-user-role';
     public const CAN_DELETE_ROLE = 'delete-role';
     public const CAN_GET_ROLES = 'get-roles';
@@ -24,7 +26,7 @@ class Permissions {
     public const CAN_GET_USER_SAVINGS = 'get-user-savings';
     public const CAN_GET_USER_SAVING = 'get-user-saving';
     public const CAN_DELETE_USER_SAVING = 'delete-user-saving';
-    public const CAN_GET_SAVINGS_STATISTICS ='get-saving-statistics';
+    public const CAN_GET_SAVINGS_STATISTICS = 'get-saving-statistics';
 
     public const CAN_CREATE_PAYMENT_CATEGORY = 'create-payment-category';
     public const CAN_UPDATE_PAYMENT_CATEGORY = 'update-payment-category';
@@ -62,7 +64,7 @@ class Permissions {
     public const CAN_GET_EXPENDITURE_DETAILS = 'get-expenditure-details';
     public const CAN_GET_EXPENDITURE_DETAIL = 'get-expenditure-detail';
     public const CAN_DELETE_EXPENDITURE_DETAIL = 'delete-expenditure-detail';
-    public const CAN_GET_EXPENDITURE_STATISTICS ='get-expenditure-statistics';
+    public const CAN_GET_EXPENDITURE_STATISTICS = 'get-expenditure-statistics';
 
     public const CAN_CREATE_INCOME_ACTIVITY = 'create-income-activity';
     public const CAN_UPDATE_INCOME_ACTIVITY = 'update-income-activity';
@@ -79,13 +81,31 @@ class Permissions {
     public const CAN_GET_USER_CONTRIBUTIONS = 'get-user-contributions';
     public const CAN_GET_USER_CONTRIBUTION =  'get-user-contribution';
     public const CAN_COLLECT_USER_CONTRIBUTIONS = 'collect-user-contribution';
-    public const CAN_GET_CONTRIBUTION_STATISTICS ='get-contribution-statistics';
+    public const CAN_GET_CONTRIBUTION_STATISTICS = 'get-contribution-statistics';
 
     public const CAN_CREATE_SPONSORSHIPS = 'create-sponsorships';
     public const CAN_UPDATE_SPONSORSHIPS = 'update-sponsorship';
     public const CAN_GET_SPONSORSHIPS = 'get-sponsorship';
     public const CAN_GET_SPONSORSHIP = 'get-sponsor-ship';
-    public const CAN_DELETE_SPONSORSHIP ='delete-sponsorship';
+    public const CAN_DELETE_SPONSORSHIP = 'delete-sponsorship';
 
-    public const CAN_GENERATE_REPORTS ='generate-reports';
+    public const CAN_GENERATE_REPORTS = 'generate-reports';
+
+    public const CAN_CREATE_SUBSCRIPTION_PLAN = 'create-subscription-plan';
+    public const CAN_UPDATE_SUBSCRIPTION_PLAN = 'update-subscription-plan';
+    public const CAN_GET_SUBSCRIPTION_PLANS = 'get-subscription-plans';
+    public const CAN_GET_SUBSCRIPTION_PLAN = 'get-subscription-plan';
+    public const CAN_DELETE_SUBSCRIPTION_PLAN = 'delete-subscription-plan';
+    public const CAN_CREATE_SUBSCRIPTION = 'create-subscription';
+    public const CAN_UPDATE_SUBSCRIPTION = 'update-subscription';
+    public const CAN_GET_SUBSCRIPTIONS = 'get-subscriptions';
+    public const CAN_GET_SUBSCRIPTION = 'get-subscription';
+    public const CAN_DELETE_SUBSCRIPTION = 'delete-subscription';
+    public const CAN_CREATE_PAYMENT = 'create-payment';
+    public const CAN_UPDATE_PAYMENT = 'update-payment';
+    public const CAN_GET_PAYMENTS = 'get-payments';
+    public const CAN_GET_PAYMENT = 'get-payment';
+    public const CAN_DELETE_PAYMENT = 'delete-payment';
+    public const CAN_GET_ORGANISATION_SUBSCRIPTIONS = 'get-organisation-subscriptions';
+
 }
