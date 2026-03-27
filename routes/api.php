@@ -37,6 +37,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::post('/broadcasting/auth', function (Request $request) {
     logger()->info('Auth User Check:', ['user' => auth('sanctum')->user()]);
     return Broadcast::auth($request);
@@ -52,7 +53,7 @@ Route::prefix('public/auth')->group(function () {
     Route::post('/validate/password-reset', [UserController::class, 'validateResetToken'])->middleware('isAuthorizedToAccessPlatform');
     Route::post('/reset-password', [UserController::class, 'resetPassword'])->middleware('isAuthorizedToAccessPlatform');
     Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware('isAuthorizedToCreateOrganisation');
-        Route::post('verify-client', [UserController::class, 'verifyClientAccount']);
+    Route::post('verify-client', [UserController::class, 'verifyClientAccount']);
 });
 
 Route::prefix('public/quickrecords/')->group(function () {
@@ -66,7 +67,7 @@ Route::middleware('isAuthorizedToSubscribe')->group(function () {
         Route::post('/client/subscriptions/initiate-payment', [PaymentController::class, 'initiatePayment']);
         Route::post('/client/subscriptions/payments/{id}/check-payment-status', [PaymentController::class, 'checkPaymentStatus']);
         Route::post('/client/subscriptions/incomplete', [SubscriptionController::class, 'getClientIncompleteSubscription']);
-         Route::post('/subscriptions/trial', [SubscriptionController::class, 'getActivateSubscriptionTrial']);
+        Route::post('/subscriptions/trial', [SubscriptionController::class, 'getActivateSubscriptionTrial']);
     });
 });
 

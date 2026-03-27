@@ -15,11 +15,14 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'broadcasting/auth'],
+    'paths' => ['api/*', 'broadcasting/auth', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [
+        env('FRONTEND_URL', 'http://localhost:7000'),
+        'http://127.0.0.1:7000'
+    ],
 
     'allowed_origins_patterns' => ["*"],
 
@@ -28,7 +31,7 @@ return [
         'X-Requested-With',
         'Authorization',
         'Accept',
-        'X-XSRF-TOKEN'
+        'X-XSRF-TOKEN',
     ],
 
     'exposed_headers' => [],

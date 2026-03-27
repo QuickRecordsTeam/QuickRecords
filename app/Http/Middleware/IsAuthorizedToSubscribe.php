@@ -17,10 +17,8 @@ class IsAuthorizedToSubscribe
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $loginId = $request->input('login_id');
-        $user = User::with(['roles', 'organisation.subscriptions'])
-            ->where('id', $loginId)
-            ->first();
+
+        $user = $request->user();
 
         if (!$user) {
             return ResponseTrait::sendError('Access denied', 'You are not authorized to login', 403);

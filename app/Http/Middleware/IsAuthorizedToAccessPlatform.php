@@ -18,11 +18,8 @@ class IsAuthorizedToAccessPlatform
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $loginId = $request->input('login_id');
-        $user = User::with(['roles', 'organisation.subscriptions'])
-            ->where('username', $loginId)
-            ->orWhere('email', $loginId)
-            ->first();
+
+        $user = $request->user();
 
         if (!$user) {
             return ResponseTrait::sendError('Access denied', 'Unauthorized! Invalid Account', 403);

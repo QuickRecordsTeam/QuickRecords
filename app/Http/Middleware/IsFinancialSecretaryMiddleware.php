@@ -19,7 +19,7 @@ class IsFinancialSecretaryMiddleware
      */
     public function handle($request, Closure $next)
     {
-       $allowedRoles =  [Roles::MEMBER, Roles::FINANCIAL_SECRETARY];
+        $allowedRoles =  [Roles::MEMBER, Roles::FINANCIAL_SECRETARY];
         $userRoles = $request->user()->roles->whereIn('name', $allowedRoles);
 
         if ($userRoles->isEmpty() || count($userRoles) < 2) {

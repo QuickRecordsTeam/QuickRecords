@@ -1,22 +1,6 @@
 <?php
 
 namespace App\Http;
-
-use App\Http\Middleware\IsAdminIsPresidentIsFinancialSecretary;
-use App\Http\Middleware\IsAdminMiddleware;
-use App\Http\Middleware\IsAdminOrIsTreasurer;
-use App\Http\Middleware\IsAuditorMiddleware;
-use App\Http\Middleware\IsElectionAdmin;
-use App\Http\Middleware\IsFinancialSecretaryMiddleware;
-use App\Http\Middleware\IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin;
-use App\Http\Middleware\isPresidentMiddleware;
-use App\Http\Middleware\IsPresidentOrIsAdmin;
-use App\Http\Middleware\isPresidentOrisFinancialSecretary;
-use App\Http\Middleware\IsSystemAdminMiddleware;
-use App\Http\Middleware\IsTreasurerMiddleware;
-use App\Http\Middleware\IsTreasurerOrIsFinancialSecretary;
-use App\Http\Middleware\IsTreasurerOrIsFinancialSecretaryOrIsPresident;
-use App\Http\Middleware\IsUserMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 
@@ -31,9 +15,7 @@ class Kernel extends HttpKernel
      */
     protected $middleware = [
         \Illuminate\Http\Middleware\HandleCors::class,
-
         \Illuminate\Http\Middleware\TrustProxies::class,
-
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
@@ -50,6 +32,7 @@ class Kernel extends HttpKernel
            \App\Http\Middleware\EncryptCookies::class,
         \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
         \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\Session\Middleware\AuthenticateSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \App\Http\Middleware\VerifyCsrfToken::class, // Web has this by default
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -58,7 +41,6 @@ class Kernel extends HttpKernel
         'api' => [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:60,1',
-            \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -85,27 +67,5 @@ class Kernel extends HttpKernel
         // 'role'                  => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         // 'permission'            => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         // 'role_or_permission'    => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
-
-        'isPresident'           => IsPresidentMiddleware::class,
-        'isAdmin'               => IsAdminMiddleware::class,
-        'isAuditor'             => IsAuditorMiddleware::class,
-        'isFinancialSecretary'  => IsFinancialSecretaryMiddleware::class,
-        'isTreasurer'           => IsTreasurerMiddleware::class,
-        'isUser'                => IsUserMiddleware::class,
-        'isPresidentOrIsFinancialSecretary' => IsPresidentOrisFinancialSecretary::class,
-        'isTreasurerOrIsFinancialSecretary' => IsTreasurerOrIsFinancialSecretary::class,
-        'isTreasurerOrIsFinancialSecretaryOrIsPresident' => IsTreasurerOrIsFinancialSecretaryOrIsPresident::class,
-        'isElectionAdmin' => IsElectionAdmin::class,
-        'IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin' => IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin::class,
-        'isPresidentOrIsAdmin' => IsPresidentOrIsAdmin::class,
-        'isAdminIsPresidentIsFinancialSecretary' => IsAdminIsPresidentIsFinancialSecretary::class,
-        'IsAdminOrIsTreasurer' => IsAdminOrIsTreasurer::class,
-        'isSystemAdmin' => IsSystemAdminMiddleware::class,
-        'subscribed' => \App\Http\Middleware\SubscriptionMiddleware::class,
-        'isAuthorizedToAccessPlatform' => \App\Http\Middleware\IsAuthorizedToAccessPlatform::class,
-        'isAuthorizedToCreateOrganisation' => \App\Http\Middleware\IsAuthorizedToCreateOrganisation::class,
-        'isAuthorizedToSubscribe' => \App\Http\Middleware\IsAuthorizedToSubscribe::class,
-
-
     ];
 }

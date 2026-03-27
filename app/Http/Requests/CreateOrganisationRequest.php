@@ -37,9 +37,6 @@ class CreateOrganisationRequest extends FormRequest
         ];
          isset($this->id) ? $rules['id'][] = 'exists:organisations,id': $rules['email'][] = 'unique:organisations,email';
 
-
-
-
         return $rules;
     }
 }
