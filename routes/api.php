@@ -52,7 +52,7 @@ Route::prefix('public/auth')->group(function () {
     Route::post('/reset-password-token', [UserController::class, 'setPasswordResetToken'])->middleware('isAuthorizedToAccessPlatform');
     Route::post('/validate/password-reset', [UserController::class, 'validateResetToken'])->middleware('isAuthorizedToAccessPlatform');
     Route::post('/reset-password', [UserController::class, 'resetPassword'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware('isAuthorizedToCreateOrganisation');
+    Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware(['auth:sanctum','isAuthorizedToCreateOrganisation']);
     Route::post('verify-client', [UserController::class, 'verifyClientAccount']);
 });
 
@@ -60,7 +60,7 @@ Route::prefix('public/quickrecords/')->group(function () {
     Route::post('send-inquiry-message', [InquiryController::class, 'sendMessage']);
 });
 
-Route::middleware('isAuthorizedToSubscribe')->group(function () {
+Route::middleware(['auth:sanctum', 'isAuthorizedToSubscribe'])->group(function () {
     Route::prefix('protected/init')->group(function () {
         Route::post('/subscriptions', [SubscriptionController::class, 'createSubscription']); //first subscription for the organisation, after this the user can access access the application. The payment must intercepted and either completed or set package set to trailing before the completion of this process
         Route::post('/client/subscriptions/{id}/payment-fee', [SubscriptionController::class, 'computeTotalSubscriptionAmount']);
@@ -73,7 +73,7 @@ Route::middleware('isAuthorizedToSubscribe')->group(function () {
 
 Route::post('/public/subscription/payment-callback', [PaymentController::class, 'handlePaymentCallback']);
 
-Route::middleware(['auth:sanctum', 'subscribed'])->group(function () {
+Route::middleware(['auth:sanctum', 'isAuthorizedToSubscribe'])->group(function () {
 
     Route::post('/logout', [UserController::class, 'logOutUser']);
 

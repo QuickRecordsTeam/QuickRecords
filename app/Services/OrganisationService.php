@@ -32,10 +32,7 @@ class OrganisationService implements OrganisationInterface
     public function createOrganisationAccount($request)
     {
 
-        $user = User::where('id', $request['account_id'])->first();
-        if (is_null($user)) {
-            throw new BusinessValidationException('User account does not exist', 403);
-        }
+        $user =  auth('api')->user();
         $organisation = Organisation::firstOrCreate(
             [
                 'id' => $request['id']
@@ -46,8 +43,8 @@ class OrganisationService implements OrganisationInterface
                 'telephone'        => $request->telephone,
                 'description'      => $request->description,
                 'address'          => $request->address,
-                'salutation'       => $request->salutation,
-                'box_number'       => $request->box_number,
+                'salutation'       => "",
+                'box_number'       => 0000,
                 'created_by'       => $user->id,
                 'region'           => $request->region,
                 'referral_code'    => $this->generateReferralCode(),

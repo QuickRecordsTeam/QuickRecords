@@ -64,7 +64,7 @@ class IsAuthorizedToAccessPlatform
             }
         }
 
-        if ($subscription->status === 'trialing' && $now->greaterThan($subscription->trial_ends_at)) {
+        if ($subscription->status === 'trialing' && $now->greaterThan($subscription->trial_period_end_date)) {
             return ResponseTrait::sendError('Access denied', 'Trial period has ended.', 403);
         }
 

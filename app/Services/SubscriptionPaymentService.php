@@ -178,7 +178,7 @@ class SubscriptionPaymentService implements PaymentInterface
 
     private function getSubscriptionDuration($subscription_plan, $billing_duration)
     {
-        $start = BillingCyclePlans::MONTHLY === $subscription_plan->billing_cycle ? \Carbon\Carbon::now()->startOfDay() : \Carbon\Carbon::now()->startOfYear();
+        $start = BillingCyclePlans::MONTHLY === $subscription_plan->billing_cycle ? \Carbon\Carbon::now() : \Carbon\Carbon::now();
         $end = BillingCyclePlans::MONTHLY === $subscription_plan->billing_cycle ? \Carbon\Carbon::now()->addMonths($billing_duration) : \Carbon\Carbon::now()->addYears($billing_duration);
         return [
             'current_period_start_date' => $start,

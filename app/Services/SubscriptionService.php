@@ -68,12 +68,12 @@ class SubscriptionService implements SubscriptionInterface
             throw new BusinessValidationException("Organisation not found", 404);
         }
 
-        $trial_sub = $organisation->subscriptions()->where('is_trail', true)->first();
-
-        if ($trial_sub) {
-            throw new BusinessValidationException("The Organisation currently have a trial subscription", 400);
-        }
-        $subscription = Subscription::create(
+        $subscription = Subscription::updateOrCreate(
+             [
+                'organisation_id' => $organisation->id,
+                'subscription_plan_id' => $subscription_plan->id,
+                'status' => 'incomplete'
+            ],
             [
                 'organisation_id' => $organisation->id,
                 'subscription_plan_id' => $subscription_plan->id,
@@ -196,7 +196,7 @@ class SubscriptionService implements SubscriptionInterface
 
     private function getTrailDuration()
     {
-        $start = \Carbon\Carbon::now()->startOfDay();
+        $start = \Carbon\Carbon::now();
         $end = \Carbon\Carbon::now()->addMonths(1);
         return [
             'trial_period_start_date' => $start,

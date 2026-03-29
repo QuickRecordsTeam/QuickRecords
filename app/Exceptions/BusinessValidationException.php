@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Http\Request;
 use Throwable;
 
 class BusinessValidationException extends Exception
@@ -12,15 +13,5 @@ class BusinessValidationException extends Exception
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * Register the exception handling callbacks for the application.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        $this->reportable(function (BusinessValidationException $e) {
-            //
-        });
-    }
+
 }

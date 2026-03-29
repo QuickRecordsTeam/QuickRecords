@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Http\Request;
 use Throwable;
 
 class UnAuthorizedException extends Exception
@@ -11,4 +12,5 @@ class UnAuthorizedException extends Exception
     {
         parent::__construct($message, $code, $previous);
     }
+
 }

@@ -27,7 +27,6 @@ class SubscriptionRequest extends FormRequest
             'auto_renewal' => 'required|boolean',
             'is_trial' => 'required|boolean',
             'referral_code' => 'nullable|string|exists:organisations,referral_code',
-            'login_id'      => 'required|exists:users,id',
         ];
     }
 
