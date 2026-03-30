@@ -236,7 +236,7 @@ class UserManagementService implements UserManagementInterface
 
             $currentSession = $this->session_service->getCurrentSession();
 
-            $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+            $active_subscription = $user->organisation->subscriptions()->whereIn('status', ['active', 'trialing', 'past_due'])->first();
 
             return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession, new SubscriptionResource($active_subscription));
         }
@@ -435,8 +435,9 @@ class UserManagementService implements UserManagementInterface
     public function resetPassword($request)
     {
         $resetData = PasswordReset::where('token', $request->token)->first();
-        if (isset($resetData)) {
-            if (Carbon::now()->greaterThan($resetData->expired_at)) {
+
+        if (($resetData)) {
+            if (Carbon::now()->greaterThan($resetData->expire_at)) {
                 throw new UnAuthorizedException("Password Reset token has Expired", 403);
             }
             $user = User::findOrFail($request->user_id);

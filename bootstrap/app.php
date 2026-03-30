@@ -4,6 +4,7 @@ use App\Exceptions\BusinessValidationException;
 use App\Exceptions\EmailException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Exceptions\UnAuthorizedException;
+use App\Http\Middleware\CanAuthenticate;
 use App\Http\Middleware\IsAdminIsPresidentIsFinancialSecretary;
 use App\Http\Middleware\IsAdminMiddleware;
 use App\Http\Middleware\IsAdminOrIsTreasurer;
@@ -66,6 +67,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'isAuthorizedToAccessPlatform' =>  IsAuthorizedToAccessPlatform::class,
             'isAuthorizedToCreateOrganisation' =>  IsAuthorizedToCreateOrganisation::class,
             'isAuthorizedToSubscribe' =>  IsAuthorizedToSubscribe::class,
+            'canAuthenticate' => CanAuthenticate::class
         ]);
         $middleware->statefulApi();
     })

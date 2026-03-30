@@ -45,14 +45,14 @@ Route::post('/broadcasting/auth', function (Request $request) {
 
 
 Route::prefix('public/auth')->group(function () {
-    Route::post('/login', [UserController::class, 'logInUser'])->middleware('isAuthorizedToAccessPlatform');
+    Route::post('/login', [UserController::class, 'logInUser'])->middleware('canAuthenticate');
     Route::post('/signup', [UserController::class, 'createAccount']);
-    Route::post('/check-user', [UserController::class, 'checkUserExist'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/set-password', [UserController::class, 'setPassword'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/reset-password-token', [UserController::class, 'setPasswordResetToken'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/validate/password-reset', [UserController::class, 'validateResetToken'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/reset-password', [UserController::class, 'resetPassword'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware(['auth:sanctum','isAuthorizedToCreateOrganisation']);
+    Route::post('/check-user', [UserController::class, 'checkUserExist'])->middleware('canAuthenticate');
+    Route::post('/set-password', [UserController::class, 'setPassword'])->middleware('canAuthenticate');
+    Route::post('/reset-password-token', [UserController::class, 'setPasswordResetToken']);
+    Route::post('/validate/password-reset', [UserController::class, 'validateResetToken']);
+    Route::post('/reset-password', [UserController::class, 'resetPassword'])->middleware('canAuthenticate');
+    Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware(['auth:sanctum', 'isAuthorizedToCreateOrganisation']);
     Route::post('verify-client', [UserController::class, 'verifyClientAccount']);
 });
 
@@ -73,7 +73,7 @@ Route::middleware(['auth:sanctum', 'isAuthorizedToSubscribe'])->group(function (
 
 Route::post('/public/subscription/payment-callback', [PaymentController::class, 'handlePaymentCallback']);
 
-Route::middleware(['auth:sanctum', 'isAuthorizedToSubscribe'])->group(function () {
+Route::middleware(['auth:sanctum', 'isAuthorizedToAccessPlatform'])->group(function () {
 
     Route::post('/logout', [UserController::class, 'logOutUser']);
 
