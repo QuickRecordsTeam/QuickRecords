@@ -10,6 +10,7 @@ use App\Constants\Roles;
 use App\Constants\SessionStatus;
 use App\Exceptions\BusinessValidationException;
 use App\Exceptions\EmailException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Exceptions\UnAuthorizedException;
 use App\Http\Resources\ClientVerificationResource;
 use App\Http\Resources\CreateAccountResource;
@@ -225,10 +226,18 @@ class UserManagementService implements UserManagementInterface
         if (!Hash::check($request->password, $user->password)) {
             throw new UnAuthorizedException('Bad Credentials', 403);
         } else {
+            Auth::login($user);
+
+            $request->session()->regenerate();
+
             $token = $this->generateToken($user);
+
             $hasLoginBefore = $this->checkIfUserHasLogin($user);
+
             $currentSession = $this->session_service->getCurrentSession();
-            $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+
+            $active_subscription = $user->organisation->subscriptions()->whereIn('status', ['active', 'trialing', 'past_due'])->first();
+
             return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession, new SubscriptionResource($active_subscription));
         }
     }
@@ -255,26 +264,40 @@ class UserManagementService implements UserManagementInterface
     {
 
         $user = $this->checkUserExist($request);
+
         $user->password = Hash::make($request->password);
+
         $user->email_verified_at = Carbon::now()->toDateTimeString();
+
         $user->save();
 
         $this->role_service->addUserRole($user->id, $request->role, 'Default');
 
+        Auth::login($user);
+
+        $request->session()->regenerate();
+
         $token = $this->generateToken($user);
+
         $hasLoginBefore = $this->checkIfUserHasLogin($user);
+
         $currentSession = $this->session_service->getCurrentSession();
+
         $active_subscription = $user->organisation->subscriptions()->where('status', 'active')->first();
+
         return new TokenResource(new UserResource($user, $token, $hasLoginBefore), $currentSession, new SubscriptionResource($active_subscription));
     }
 
     public function updatePassword($request)
     {
         $user = User::findOrFail($request->user_id);
+
         if (!Hash::check($request->old_password, $user->password)) {
             throw new UnAuthorizedException("Old Password not match", 403);
         }
+
         $user->password = Hash::make($request->password);
+
         $user->save();
     }
 
@@ -412,8 +435,9 @@ class UserManagementService implements UserManagementInterface
     public function resetPassword($request)
     {
         $resetData = PasswordReset::where('token', $request->token)->first();
-        if (isset($resetData)) {
-            if (Carbon::now()->greaterThan($resetData->expired_at)) {
+
+        if (($resetData)) {
+            if (Carbon::now()->greaterThan($resetData->expire_at)) {
                 throw new UnAuthorizedException("Password Reset token has Expired", 403);
             }
             $user = User::findOrFail($request->user_id);
@@ -482,12 +506,14 @@ class UserManagementService implements UserManagementInterface
     {
         $user = User::where('username', $request->input('username'))->first();
         if (!$user) {
-            throw new BusinessValidationException("User account not found", 404);
+            throw new ResourceNotFoundException("User account not found", 404);
         }
         if (!Hash::check($request->password, $user->password)) {
             throw new BusinessValidationException("User account not found", 403);
         }
+        Auth::login($user);
 
+        $request->session()->regenerate();
         return new ClientVerificationResource($user);
     }
     private function generateToken($user)

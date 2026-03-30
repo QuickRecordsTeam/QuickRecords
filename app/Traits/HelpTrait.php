@@ -690,10 +690,7 @@ trait HelpTrait
 
     public function generateSecurityToken($size)
     {
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $pin = mt_rand(1000000, 9999999)
-            . mt_rand(1000000, 9999999)
-            . $characters[rand(0, strlen($characters) - 1)];
+        $pin = mt_rand(1000000, 9999999) . mt_rand(1000000, 9999999);
         return substr(str_shuffle($pin), 0, $size);
     }
 

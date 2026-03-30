@@ -37,6 +37,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::post('/broadcasting/auth', function (Request $request) {
     logger()->info('Auth User Check:', ['user' => auth('sanctum')->user()]);
     return Broadcast::auth($request);
@@ -44,35 +45,35 @@ Route::post('/broadcasting/auth', function (Request $request) {
 
 
 Route::prefix('public/auth')->group(function () {
-    Route::post('/login', [UserController::class, 'logInUser'])->middleware('isAuthorizedToAccessPlatform');
+    Route::post('/login', [UserController::class, 'logInUser'])->middleware('canAuthenticate');
     Route::post('/signup', [UserController::class, 'createAccount']);
-    Route::post('/check-user', [UserController::class, 'checkUserExist'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/set-password', [UserController::class, 'setPassword'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/reset-password-token', [UserController::class, 'setPasswordResetToken'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/validate/password-reset', [UserController::class, 'validateResetToken'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/reset-password', [UserController::class, 'resetPassword'])->middleware('isAuthorizedToAccessPlatform');
-    Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware('isAuthorizedToCreateOrganisation');
-        Route::post('verify-client', [UserController::class, 'verifyClientAccount']);
+    Route::post('/check-user', [UserController::class, 'checkUserExist'])->middleware('canAuthenticate');
+    Route::post('/set-password', [UserController::class, 'setPassword'])->middleware('canAuthenticate');
+    Route::post('/reset-password-token', [UserController::class, 'setPasswordResetToken']);
+    Route::post('/validate/password-reset', [UserController::class, 'validateResetToken']);
+    Route::post('/reset-password', [UserController::class, 'resetPassword'])->middleware('canAuthenticate');
+    Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware(['auth:sanctum', 'isAuthorizedToCreateOrganisation']);
+    Route::post('verify-client', [UserController::class, 'verifyClientAccount']);
 });
 
 Route::prefix('public/quickrecords/')->group(function () {
     Route::post('send-inquiry-message', [InquiryController::class, 'sendMessage']);
 });
 
-Route::middleware('isAuthorizedToSubscribe')->group(function () {
+Route::middleware(['auth:sanctum', 'isAuthorizedToSubscribe'])->group(function () {
     Route::prefix('protected/init')->group(function () {
         Route::post('/subscriptions', [SubscriptionController::class, 'createSubscription']); //first subscription for the organisation, after this the user can access access the application. The payment must intercepted and either completed or set package set to trailing before the completion of this process
         Route::post('/client/subscriptions/{id}/payment-fee', [SubscriptionController::class, 'computeTotalSubscriptionAmount']);
         Route::post('/client/subscriptions/initiate-payment', [PaymentController::class, 'initiatePayment']);
         Route::post('/client/subscriptions/payments/{id}/check-payment-status', [PaymentController::class, 'checkPaymentStatus']);
         Route::post('/client/subscriptions/incomplete', [SubscriptionController::class, 'getClientIncompleteSubscription']);
-         Route::post('/subscriptions/trial', [SubscriptionController::class, 'getActivateSubscriptionTrial']);
+        Route::post('/subscriptions/trial', [SubscriptionController::class, 'getActivateSubscriptionTrial']);
     });
 });
 
 Route::post('/public/subscription/payment-callback', [PaymentController::class, 'handlePaymentCallback']);
 
-Route::middleware(['auth:sanctum', 'subscribed'])->group(function () {
+Route::middleware(['auth:sanctum', 'isAuthorizedToAccessPlatform'])->group(function () {
 
     Route::post('/logout', [UserController::class, 'logOutUser']);
 

@@ -3,12 +3,13 @@
 namespace App\Http\Middleware;
 
 use App\Constants\SessionStatus;
+use App\Models\User;
 use App\Traits\ResponseTrait;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class IsAuthorizedToAccessPlatform
+class CanAuthenticate
 {
     /**
      * Handle an incoming request.
@@ -17,8 +18,10 @@ class IsAuthorizedToAccessPlatform
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-        $user = $request->user();
+        $user = User::where('username', $request->input('credential'))
+                    ->orWhere('email', $request->input('credential'))
+                    ->orWhere('id', $request->input('user_id'))
+                    ->first();
 
         if (!$user) {
             return ResponseTrait::sendError('Access denied', 'Unauthorized! Invalid Account', 403);
