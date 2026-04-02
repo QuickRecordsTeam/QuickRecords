@@ -58,7 +58,8 @@ class UsersImport implements ToModel, WithStartRow, WithCustomCsvSettings
                 'organisation_id' => $this->organisation_id,
                 'updated_by'      => $this->updated_by,
                 'password'        => "",
-                'status'          => SessionStatus::ACTIVE
+                'status'          => SessionStatus::ACTIVE,
+                'username'        => $row[6]
             ]);
             $this->saveUserRole($saved->id, $this->assignRole, $this->updated_by);
         }
