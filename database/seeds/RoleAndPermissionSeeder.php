@@ -574,38 +574,44 @@ class RoleAndPermissionSeeder extends Seeder
             'name'       => Roles::ADMIN,
             'guard_name' => 'api',
             'id'         => Str::uuid()->toString(),
-            'updated_by' => 'info@quickrecords.net'
+            'updated_by' => 'info@quickrecords.net',
+            'term'        => 3
         ]);
         Role::create([
             'name'       => Roles::PRESIDENT,
             'guard_name' => 'api',
             'id'         => Str::uuid()->toString(),
-            'updated_by' => 'info@quickrecords.net'
+            'updated_by' => 'info@quickrecords.net',
+            'term'        => 3
         ]);
         Role::create([
             'name'          => Roles::FINANCIAL_SECRETARY,
             'guard_name'    => 'api',
             'id'            => Str::uuid()->toString(),
-            'updated_by' => 'info@quickrecords.net'
+            'updated_by' => 'info@quickrecords.net',
+            'term'        => 3
         ]);
         Role::create([
             'name'       => Roles::TREASURER,
             'guard_name' => 'api',
             'id'         => Str::uuid()->toString(),
-            'updated_by' => 'info@quickrecords.net'
+            'updated_by' => 'info@quickrecords.net',
+            'term'        => 3
         ]);
         Role::create([
             'name'       => Roles::MEMBER,
             'guard_name' => 'api',
             'id'         => Str::uuid()->toString(),
-            'updated_by' => 'info@quickrecords.net'
+            'updated_by' => 'info@quickrecords.net',
+            'term'        => 3
         ]);
 
         Role::create([
             'name'       => Roles::SYSTEM_ADMIN,
             'guard_name' => 'api',
             'id'         => Str::uuid()->toString(),
-            'updated_by' => 'info@quickrecords.net'
+            'updated_by' => 'info@quickrecords.net',
+            'term'        => 1
         ]);
 
 

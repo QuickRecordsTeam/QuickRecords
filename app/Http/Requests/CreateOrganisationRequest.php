@@ -25,15 +25,14 @@ class CreateOrganisationRequest extends FormRequest
     {
         $rules = [
             'name'          => 'required|max:255',
-            'email'         => ['email'],
+            'email'         => ['nullable', 'email'],
             'address'       => 'required',
-            'description'   => 'required|max:5000',//The frontend sent this as mission but it is more of a description of the organisation
+            'description'   => 'required|max:5000', //The frontend sent this as mission but it is more of a description of the organisation
             'region'        => 'string',
-            'telephone'     => 'required',//should be a string separated by /
+            'telephone'     => 'required', //should be a string separated by /
             'id'            => ['nullable'],
         ];
-         isset($this->id) ? $rules['id'][] = 'exists:organisations,id': $rules['email'][] = 'unique:organisations,email';
-
+        isset($this->id) ? $rules['id'][] = 'exists:organisations,id' : $rules['email'][] = 'unique:organisations,email';
         return $rules;
     }
 }
