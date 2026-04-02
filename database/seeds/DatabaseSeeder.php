@@ -21,23 +21,23 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(RoleAndPermissionSeeder::class);
-        $this->call(OrganisationSeeder::class);
-        $this->call(UserSeeder::class);
-        $this->call(SessionSeeder::class);
-        // $this->call(RegistrationSeeder::class);
-        $this->call(MemberRegistrationSeeder::class);
-        $this->call(PaymentCategorySeeder::class);
-        $this->call(PaymentItemSeeder::class);
-        $this->call(ExpenditureCategorySeeder::class);
-        $this->call(ExpenditureItemSeeder::class);
-        $this->call(ExpenditureDetailSeeder::class);
-        $this->call(IncomeActivitySeeder::class);
-        $this->call(UserContributionSeeder::class);
-        $this->call(UserSavingSeeder::class);
-        $this->call(ActivitySupportSeeder::class);
-        $this->call(\Database\Seeders\SubscriptionPlanSeeder::class);
-        $this->call(SubscriptionSeeder::class);
-        $this->call(PaymentSeeder::class);
+        // $this->call(OrganisationSeeder::class);
+        // $this->call(UserSeeder::class);
+        // $this->call(SessionSeeder::class);
+        // // $this->call(RegistrationSeeder::class);
+        // $this->call(MemberRegistrationSeeder::class);
+        // $this->call(PaymentCategorySeeder::class);
+        // $this->call(PaymentItemSeeder::class);
+        // $this->call(ExpenditureCategorySeeder::class);
+        // $this->call(ExpenditureItemSeeder::class);
+        // $this->call(ExpenditureDetailSeeder::class);
+        // $this->call(IncomeActivitySeeder::class);
+        // $this->call(UserContributionSeeder::class);
+        // $this->call(UserSavingSeeder::class);
+        // $this->call(ActivitySupportSeeder::class);
+        // $this->call(\Database\Seeders\SubscriptionPlanSeeder::class);
+        // $this->call(SubscriptionSeeder::class);
+        // $this->call(PaymentSeeder::class);
 
     }
 }
