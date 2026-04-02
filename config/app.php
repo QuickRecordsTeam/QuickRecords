@@ -132,6 +132,12 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'subscription_caution_period' => env('SUBSCRIPTION_PAST_DUE_CAUTION_PERIOD', 3),
+    'subscription_referral_bonus_percent' => env('SUBSCRIPTION_REFERRAL_BONUS_PERCENT', 10),
+    'payment_charge_fee_percentage' => env('PAYMENT_CHARGE_FEE_PERCENTAGE', 2),
+    'payment_gateway_api_url' => env('PAYMENT_GATEWAY_API_URL'),
+    'payment_gateway_api_username' => env('PAYMENT_GATEWAY_API_USERNAME'),
+    'payment_gateway_api_password' => env('PAYMENT_GATEWAY_API_PASSWORD'),
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
@@ -181,7 +187,7 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 

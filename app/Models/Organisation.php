@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use App\Traits\GenerateUuid;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,23 +24,33 @@ class Organisation extends Model
         'region',
         'box_number',
         'updated_by',
-        'logo'
+        'logo',
+        'referral_code',
+        'referred_code'
     ];
 
-    public function expenditureCategory() {
+    public function expenditureCategory()
+    {
         return $this->hasMany(ExpenditureCategory::class);
     }
 
-    public function incomeActivity() {
+    public function incomeActivity()
+    {
         return $this->hasMany(IncomeActivity::class);
     }
 
-    public function paymentCategory() {
+    public function paymentCategory()
+    {
         return $this->hasMany(PaymentCategory::class);
     }
 
-    public function users() {
+    public function users()
+    {
         return $this->hasMany(User::class);
     }
 
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
 }

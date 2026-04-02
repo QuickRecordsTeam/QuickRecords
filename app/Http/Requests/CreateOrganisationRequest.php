@@ -23,16 +23,16 @@ class CreateOrganisationRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'name'          => 'required|max:255',
-            'email'         => 'email',
+            'email'         => ['nullable', 'email'],
             'address'       => 'required',
-            'box_number'    => 'integer',
-            'description'   => 'required|max:5000',
-            'salutation'    => 'string',
+            'description'   => 'required|max:5000', //The frontend sent this as mission but it is more of a description of the organisation
             'region'        => 'string',
-            'telephone'     => 'required',//should be a string separated by /
-            'id'            => ''
+            'telephone'     => 'required', //should be a string separated by /
+            'id'            => ['nullable'],
         ];
+        isset($this->id) ? $rules['id'][] = 'exists:organisations,id' : $rules['email'][] = 'unique:organisations,email';
+        return $rules;
     }
 }

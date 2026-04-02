@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Constants\Roles;
-use App\Models\CustomRole;
 use App\Traits\ResponseTrait;
 use Closure;
 
@@ -19,7 +18,11 @@ class IsUserMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if(count(collect($request->user()->roles->toArray())->whereIn('name', [Roles::MEMBER])->toArray()) < 1){
+
+        $allowedRoles =  [Roles::MEMBER];
+        $userRoles = $request->user()->roles->whereIn('name', $allowedRoles);
+
+        if ($userRoles->isEmpty() || count($userRoles) < 2) {
             return ResponseTrait::sendError('Access denied', 'You dont have the role to access this route', 403);
         }
         return $next($request);

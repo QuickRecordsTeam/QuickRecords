@@ -5,41 +5,33 @@ namespace App\Services;
 
 
 use App\Constants\SessionStatus;
+use App\Exceptions\ResourceNotFoundException;
 use App\Http\Resources\RegisterFeeResource;
-use App\Http\Resources\RegistrationFeeResourceCollection;
 use App\Interfaces\RegistrationFeeInterface;
 use App\Models\Registration;
-use Illuminate\Support\Facades\DB;
 
 class RegistrationFeeService implements RegistrationFeeInterface
 {
 
     public function createRegistrationFee($request)
     {
-        $exist_fees = Registration::all()->toArray();
-        if(count($exist_fees) == 0){
-            Registration::create([
-                'is_compulsory' => $request->is_compulsory,
-                'amount'        => $request->amount,
-                'status'        => SessionStatus::ACTIVE,
-                'frequency'     => $request->frequency,
-                'updated_by'    => $request->user()->name
-            ]);
-        }else {
-            Registration::create([
-                'is_compulsory' => $request->is_compulsory,
-                'amount'        => $request->amount,
-                'status'        => SessionStatus::IN_ACTIVE,
-                'frequency'     => $request->frequency,
-                'updated_by'    => $request->user()->name
-            ]);
+        $exist_fee = $this->getActiveRegistrationFee();
+        if ($exist_fee) {
+            throw new ResourceNotFoundException('An active registration fee already exists. Please update the existing fee or set it to inactive before creating a new one.');
         }
+        Registration::create([
+            'is_compulsory' => $request->is_compulsory,
+            'amount'        => $request->amount,
+            'status'        => SessionStatus::ACTIVE,
+            'frequency'     => $request->frequency,
+            'updated_by'    => $request->user()->name
+        ]);
     }
 
     public function updateRegistrationFee($request, $id)
     {
-        $activeRegFee = Registration::where('status', SessionStatus::ACTIVE)->first();
-        if(SessionStatus::ACTIVE == $request->status){
+        $activeRegFee = $this->getActiveRegistrationFee();
+        if (SessionStatus::ACTIVE == $request->status) {
             $activeRegFee->update([
                 'status' => SessionStatus::IN_ACTIVE
             ]);
@@ -62,7 +54,11 @@ class RegistrationFeeService implements RegistrationFeeInterface
 
     public function getCurrentRegistrationFee()
     {
-        return Registration::where('status', SessionStatus::ACTIVE)->firstOrFail();
+        $fee = $this->getActiveRegistrationFee();
+        if (!$fee) {
+            throw new ResourceNotFoundException('No active registration fee found');
+        }
+        return $fee;
     }
 
     public function deleteRegistrationFee($id)
@@ -75,5 +71,10 @@ class RegistrationFeeService implements RegistrationFeeInterface
         $exist = Registration::where('status', SessionStatus::ACTIVE);
         $exist->update('status', SessionStatus::IN_ACTIVE);
         Registration::findOrFail($id)->update('status', SessionStatus::ACTIVE);
+    }
+
+    private function getActiveRegistrationFee()
+    {
+        return Registration::where('status', SessionStatus::ACTIVE)->first();
     }
 }

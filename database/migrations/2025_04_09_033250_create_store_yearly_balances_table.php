@@ -21,11 +21,11 @@ class CreateStoreYearlyBalancesTable extends Migration
             $table->timestamps();
         });
 
-        \App\Models\StoreYearlyBalance::create([
-            'session_id' => '8015d366-baf8-4a72-bec2-d473ca3ad0f8',
-            'balance'     => 340400,
-            'updated_by' => 'default'
-        ]);
+        // \App\Models\StoreYearlyBalance::create([
+        //     'session_id' => '8015d366-baf8-4a72-bec2-d473ca3ad0f8',
+        //     'balance'     => 340400,
+        //     'updated_by' => 'default'
+        // ]);
     }
 
     /**
