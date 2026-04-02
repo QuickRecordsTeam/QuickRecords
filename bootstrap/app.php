@@ -24,6 +24,7 @@ use App\Http\Middleware\IsTreasurerOrIsFinancialSecretary;
 use App\Http\Middleware\IsTreasurerOrIsFinancialSecretaryOrIsPresident;
 use App\Http\Middleware\IsUserMiddleware;
 use App\Http\Middleware\SubscriptionMiddleware;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -76,6 +77,13 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
+            ], 404);
+        });
+
+        $exceptions->render(function (ModelNotFoundException $e, Request $request) {
+            return response()->json([
+                'success' => false,
+                'message' => "Resource not found",
             ], 404);
         });
 
