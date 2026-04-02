@@ -36,18 +36,18 @@ class SessionSeeder extends Seeder
         //            'status' => SessionStatus::IN_ACTIVE,
         //            'updated_by' => "Edmond"
         //        ]);
-        Session::create([
-            'year' =>  "2026",
-            'status' => SessionStatus::ACTIVE,
-            'updated_by' => "Admin"
-        ]);
+        // Session::create([
+        //     'year' =>  "2026",
+        //     'status' => SessionStatus::ACTIVE,
+        //     'updated_by' => "Admin"
+        // ]);
 
-        Registration::create([
-            'amount' => 500,
-            'status'  => 'ACTIVE',
-            'updated_by' => 'default',
-            'is_compulsory' => true,
-            'frequency'  => 'YEARLY'
-        ]);
+        // Registration::create([
+        //     'amount' => 500,
+        //     'status'  => 'ACTIVE',
+        //     'updated_by' => 'default',
+        //     'is_compulsory' => true,
+        //     'frequency'  => 'YEARLY'
+        // ]);
     }
 }
