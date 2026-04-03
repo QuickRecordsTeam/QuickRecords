@@ -80,7 +80,7 @@ class UserManagementService implements UserManagementInterface
         $year = Carbon::now()->year;
         $assignedRole = $this->getAssignedRole($request->role);
 
-        if ($this->checkIfRoleCanBeAdded($assignedRole)) {
+        if ($this->checkIfRoleCanBeAdded($assignedRole, $auth_user->organisation)) {
             throw new BusinessValidationException("Only one member of your organisation can have this role", 403);
         }
         try {
@@ -99,7 +99,8 @@ class UserManagementService implements UserManagementInterface
                 'expire_at'             => Carbon::now()->addHours(24),
                 'has_seen_notification' => false,
                 'role_id'               => $assignedRole->id,
-                'invitation_token'      => $invitation_token
+                'invitation_token'      => $invitation_token,
+                'organisation_id'       => $auth_user->organisation->id
             ]);
         } catch (Exception $exception) {
             throw new BusinessValidationException($exception->getMessage(), 404);
@@ -474,11 +475,13 @@ class UserManagementService implements UserManagementInterface
         return $paymentItemMembers;
     }
 
-    public function getAdminNotifications()
+    public function getAdminNotifications($request)
     {
+        $organisation = $request->user()->organisation;
         $notifications = DB::table('users')
             ->join('member_invitations', 'users.id', '=', 'member_invitations.user_id')
             ->join('roles', 'roles.id', '=', 'member_invitations.role_id')
+            ->where('users.organisation_id', $organisation->id)
             ->whereNotNull('users.email_verified_at')
             ->select('users.name', 'users.updated_at', 'roles.name as role_name', 'member_invitations.id', 'member_invitations.has_seen_notification')
             ->orderBy('member_invitations.created_at', 'DESC')
@@ -546,13 +549,14 @@ class UserManagementService implements UserManagementInterface
         return CustomRole::findByName($role, 'api');
     }
 
-    private function checkIfRoleCanBeAdded($assign_role): bool
+    private function checkIfRoleCanBeAdded($assign_role, $organisation): bool
     {
         $users = DB::table('users')
             ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
-            ->select('users.*')
+            ->where('model_has_roles.organisation_id', $organisation->id)
             ->where('roles.name', $assign_role->name)
+            ->select('users.*')
             ->count();
 
         return $users > $assign_role->number_of_members;

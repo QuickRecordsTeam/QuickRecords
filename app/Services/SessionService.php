@@ -9,15 +9,16 @@ use App\Http\Resources\SessionResource;
 use App\Http\Resources\SessionResourceCollection;
 use App\Interfaces\SessionInterface;
 use App\Models\Session;
-use Illuminate\Support\Facades\DB;
+
 
 class SessionService implements SessionInterface
 {
 
 
-    public function getAllSessions()
+    public function getAllSessions($request)
     {
-        $sessions = DB::table('sessions')->orderBy('created_at', 'DESC')->get();
+        $organisation = $request->user()->organisation;
+        $sessions = Session::where('organisation_id', $organisation->id)->orderBy('created_at', 'DESC')->get();
         return SessionResource::collection($sessions->toArray());
     }
     public function getCurrentSession()
@@ -28,21 +29,26 @@ class SessionService implements SessionInterface
 
     public function createSession($request)
     {
-        $previousSession =  Session::where('status', SessionStatus::ACTIVE)->first();
+        $user = $request->user();
+        $organisation = $user->organisation;
+        $previousSession =  Session::where('organisation_id', $organisation->id)->where('status', SessionStatus::ACTIVE)->first();
         if(isset($previousSession)) {
             $previousSession->status = SessionStatus::IN_ACTIVE;
             $previousSession->save();
         }
+
         Session::create([
             'year'          => $request->year,
             'status'        => SessionStatus::ACTIVE,
-            'updated_by'    => $request->user()->name
+            'updated_by'    => $user->name,
+            'organisation_id' => $organisation->id
         ]);
     }
 
     public function updateSession($request, $id)
     {
-        $currentSession =  Session::where('status', SessionStatus::ACTIVE)->first();
+        $organisation = $request->user()->organisation;
+        $currentSession =  Session::where('organisation_id', $organisation->id)->where('status', SessionStatus::ACTIVE)->first();
         $updatedSession = Session::findOrFail($id);
 
         if(SessionStatus::ACTIVE == $request->status && $request->year != $currentSession->year){
@@ -69,7 +75,7 @@ class SessionService implements SessionInterface
 
     public function getPaginatedSessions($request)
     {
-        $sessions = Session::orderBy('year')->paginate($request->per_page);
+        $sessions = Session::where('organisation_id', $request->user()->organisation->id)->orderBy('year')->paginate($request->per_page);
 
         return new SessionResourceCollection($sessions, $sessions->total(), $sessions->lastPage(), (int)$sessions->perPage(), $sessions->currentPage());
     }

@@ -42,7 +42,7 @@ interface UserManagementInterface {
 
     public function getUserByPaymentItem($id, $request);
 
-    public function getAdminNotifications();
+    public function getAdminNotifications($request);
 
     public function markAllNotificationsAsRead($request);
 

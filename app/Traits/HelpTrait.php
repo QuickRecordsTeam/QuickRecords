@@ -157,7 +157,8 @@ trait HelpTrait
             'model_type'    => 'App\Models\User',
             'updated_by'    => $updated_by,
             'created_at'    => Carbon::now(),
-            'updated_at'    => Carbon::now()
+            'updated_at'    => Carbon::now(),
+            'organisation_id' => $user->organisation->id
         ]);
     }
 

@@ -367,7 +367,7 @@ class UserContributionService implements UserContributionInterface, TransactionD
 
     public function getMemberDebt($request)
     {
-        $reg_debts = $this->getMemberRegistration($request->user_id);
+        $reg_debts = $this->getMemberRegistration($request);
         $debts = $this->getMemberOwingItems($request->user_id, $request->session_id);
         return array_merge($reg_debts, $debts);
     }
@@ -474,11 +474,12 @@ class UserContributionService implements UserContributionInterface, TransactionD
         return [["percentages_data" => $percentage_contributions], ["avg_by_frequency" => $average_contributions_by_frequency], ["avg_by_type" => $average_contributions_by_type]];
     }
 
-    private function getMemberRegistration($user_id)
+    private function getMemberRegistration($request)
     {
         $reg_debts = [];
         $reg = Registration::where('is_compulsory', true)->first();
-        $sessions = $this->sessionService->getAllSessions();
+        $sessions = $this->sessionService->getAllSessions($request);
+        $user_id = $request->user_id;
         if (isset($reg)) {
             if ($reg->frequency == RegistrationFrequency::YEARLY) {
                 foreach ($sessions as $session) {

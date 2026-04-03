@@ -52,7 +52,7 @@ class BalanceSheetService implements BalanceSheetInterface
 
         $session = $this->sessionService->getSessionById($request->session_id);
 
-        $registration = $this->registrationFeeService->getCurrentRegistrationFee();
+        $registration = $this->registrationFeeService->getCurrentRegistrationFee($request);
 
         $members = $this->userManagementService->getUsers($request->organisation_id);
 

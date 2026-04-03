@@ -32,7 +32,7 @@ class OrganisationService implements OrganisationInterface
     public function createOrganisationAccount($request)
     {
 
-        $user =  auth('api')->user();
+        $user =  $request->user();
         $organisation = Organisation::firstOrCreate(
             [
                 'id' => $request['id']

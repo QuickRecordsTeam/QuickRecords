@@ -18,9 +18,9 @@ class SessionController extends Controller
     {
         $this->sessionService = $sessionService;
     }
-    public function getAllSessions()
+    public function getAllSessions(Request $request)
     {
-        $data = $this->sessionService->getAllSessions();
+        $data = $this->sessionService->getAllSessions($request);
         return $this->sendResponse($data, 200);
     }
 

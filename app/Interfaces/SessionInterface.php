@@ -6,7 +6,7 @@ namespace App\Interfaces;
 
 interface SessionInterface
 {
-    public function getAllSessions();
+    public function getAllSessions($request);
 
     public function getCurrentSession();
 
