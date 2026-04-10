@@ -19,8 +19,7 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    // 'allowed_origins' => ['https://www.quickrecords.xyz', 'https://quickrecords.xyz'],
-    'allowed_origins' => ['http://localhost:7000','http://127.0.0.1:7000'],
+    'allowed_origins' => ['https://www.quickrecords.xyz', 'https://quickrecords.xyz', 'https://mountzioncm.com', 'https://www.mountzioncm.com', 'https://api.mountzioncm.com', 'https://www.api.mountzioncm.com', 'https://www.app.quickrecords.xyz', 'https://app.quickrecords.xyz',],
 
     'allowed_origins_patterns' => ["*"],
 
