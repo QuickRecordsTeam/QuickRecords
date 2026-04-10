@@ -24,6 +24,7 @@ use App\Http\Middleware\IsTreasurerOrIsFinancialSecretary;
 use App\Http\Middleware\IsTreasurerOrIsFinancialSecretaryOrIsPresident;
 use App\Http\Middleware\IsUserMiddleware;
 use App\Http\Middleware\SubscriptionMiddleware;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -73,7 +74,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (ResourceNotFoundException $e, Request $request) {
+       $exceptions->render(function (AuthenticationException $e, Request $request) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthenticated access. Please provide a valid token.',
+            ], 401);
+        });
+        $exceptions->render(function (ResourceNotFoundException $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -87,21 +94,21 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 404);
         });
 
-        $exceptions->render(function (BusinessValidationException $e, Request $request) {
+        $exceptions->render(function (BusinessValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
             ], 400);
         });
 
-        $exceptions->render(function (EmailException $e, Request $request) {
+        $exceptions->render(function (EmailException $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
             ], 400);
         });
 
-        $exceptions->render(function (UnAuthorizedException $e, Request $request) {
+        $exceptions->render(function (UnAuthorizedException $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),

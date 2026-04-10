@@ -19,7 +19,8 @@ class Session extends Model
     protected $fillable = [
         'year',
         'updated_by',
-        'status'
+        'status',
+        'organisation_id'
     ];
 
     public function activitySupports()
@@ -60,5 +61,10 @@ class Session extends Model
     public function yearlyBalance()
     {
         return $this->hasOne(StoreYearlyBalance::class);
+    }
+
+    public function organisation()
+    {
+        return $this->belongsTo(Organisation::class);
     }
 }

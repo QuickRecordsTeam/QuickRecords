@@ -12,8 +12,6 @@ use App\Models\ExpenditureDetail;
 use App\Models\ExpenditureItem;
 use App\Models\TransactionHistory;
 use App\Traits\HelpTrait;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class ExpenditureDetailService implements ExpenditureDetailInterface, TransactionDataGroupMgt {
 

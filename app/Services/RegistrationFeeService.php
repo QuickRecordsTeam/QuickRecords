@@ -15,7 +15,8 @@ class RegistrationFeeService implements RegistrationFeeInterface
 
     public function createRegistrationFee($request)
     {
-        $exist_fee = $this->getActiveRegistrationFee();
+        $exist_fee = $this->getActiveRegistrationFee($request);
+        $user = $request->user();
         if ($exist_fee) {
             throw new ResourceNotFoundException('An active registration fee already exists. Please update the existing fee or set it to inactive before creating a new one.');
         }
@@ -24,13 +25,14 @@ class RegistrationFeeService implements RegistrationFeeInterface
             'amount'        => $request->amount,
             'status'        => SessionStatus::ACTIVE,
             'frequency'     => $request->frequency,
-            'updated_by'    => $request->user()->name
+            'updated_by'    =>$user->name,
+            'organisation_id' => $user->organisation_id
         ]);
     }
 
     public function updateRegistrationFee($request, $id)
     {
-        $activeRegFee = $this->getActiveRegistrationFee();
+        $activeRegFee = $this->getActiveRegistrationFee($request);
         if (SessionStatus::ACTIVE == $request->status) {
             $activeRegFee->update([
                 'status' => SessionStatus::IN_ACTIVE
@@ -47,14 +49,15 @@ class RegistrationFeeService implements RegistrationFeeInterface
 
     public function getAllRegistrationFee($request)
     {
-        $reg_fees = Registration::orderBy('updated_at', 'DESC')->get();
+        $organisation = $request->user()->organisation;
+        $reg_fees = Registration::where('organisation_id', $organisation->id)->orderBy('updated_at', 'DESC')->get();
 
         return RegisterFeeResource::collection($reg_fees);
     }
 
-    public function getCurrentRegistrationFee()
+    public function getCurrentRegistrationFee($request)
     {
-        $fee = $this->getActiveRegistrationFee();
+        $fee = $this->getActiveRegistrationFee($request);
         if (!$fee) {
             throw new ResourceNotFoundException('No active registration fee found');
         }
@@ -73,8 +76,9 @@ class RegistrationFeeService implements RegistrationFeeInterface
         Registration::findOrFail($id)->update('status', SessionStatus::ACTIVE);
     }
 
-    private function getActiveRegistrationFee()
+    private function getActiveRegistrationFee($request)
     {
-        return Registration::where('status', SessionStatus::ACTIVE)->first();
+        $organisation = $request->user()->organisation;
+        return Registration::where('organisation_id', $organisation->id)->where('status', SessionStatus::ACTIVE)->first();
     }
 }

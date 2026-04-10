@@ -218,8 +218,8 @@ class UserController extends Controller
         return $this->sendResponse("Invitation sent successfully", 'success');
     }
 
-    public function getInvitationNotifications(){
-        $data = $this->user_management_service->getAdminNotifications();
+    public function getInvitationNotifications(Request $request){
+        $data = $this->user_management_service->getAdminNotifications($request);
 
         return $this->sendResponse($data, 'success');
     }

@@ -39,11 +39,12 @@
             </div>
         </div>
         <div class="column_100" style="margin-left: 30px;margin-top: 20px">
+
             <div class="column_10">
             </div>
             <div class="column_25">
-                <label style="font-weight: bold; text-transform: uppercase; font-size: small;">P.O Box
-                    {{ $organisation->box_number }}, {{ $organisation->address }}</label><br />
+                <label style="font-weight: bold; text-transform: uppercase; font-size: small;">
+                    Address:{{ $organisation->address }}, {{ $organisation->region }}</label><br />
                 <label style="font-size: small;font-weight: bold">Email: {{ $organisation->email }}</label><br />
             </div>
             <div class="column_25">

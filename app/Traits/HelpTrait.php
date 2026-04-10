@@ -151,13 +151,15 @@ trait HelpTrait
 
     public function  saveUserRole($user, $role, $updated_by)
     {
+        $organisation =  $user->organisation;
         DB::table('model_has_roles')->insert([
             'role_id'       => $role->id,
             'model_id'      => $user->id,
             'model_type'    => 'App\Models\User',
             'updated_by'    => $updated_by,
             'created_at'    => Carbon::now(),
-            'updated_at'    => Carbon::now()
+            'updated_at'    => Carbon::now(),
+            'organisation_id' => ($organisation != null) ? $organisation->id : ''
         ]);
     }
 

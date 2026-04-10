@@ -286,7 +286,7 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
     public function getSavingsStatistics($request)
     {
         $monthly_stat = $this->getTotalMonthlySavings($request);
-        $yearly_stat = $this->getTotalYearlySavings();
+        $yearly_stat = $this->getTotalYearlySavings($request);
         $status_stat =  $this->getSavingsStatByStatus($request->session_id);
 
         return ['monthly_stat' => $monthly_stat, 'yearly_stat' => $yearly_stat, 'status_stat' => $status_stat];
@@ -314,10 +314,10 @@ class UserSavingService implements UserSavingInterface, TransactionDataGroupMgt
         return $total_monthly_savings;
     }
 
-    private function getTotalYearlySavings()
+    private function getTotalYearlySavings($request)
     {
         $total_yearly_savings = [];
-        $sessions = $this->sessionService->getAllSessions();
+        $sessions = $this->sessionService->getAllSessions($request);
 
         foreach ($sessions as $session) {
             $savings = UserSaving::where('session_id', $session->id)

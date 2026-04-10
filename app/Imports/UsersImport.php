@@ -71,7 +71,8 @@ class UsersImport implements ToModel, WithStartRow, WithCustomCsvSettings
             'role_id'       => $role,
             'model_id'      => $user_id,
             'model_type'    => 'App\Models\User',
-            'updated_by'    => $updated_by
+            'updated_by'    => $updated_by,
+            'organisation_id' => $this->organisation_id
         ]);
     }
 }

@@ -36,9 +36,9 @@ class RegistrationController extends Controller
         return $this->sendResponse( $data, 200);
     }
 
-    public function getCurrentRegistrationFee()
+    public function getCurrentRegistrationFee(Request $request)
     {
-        $data =$this->registration_fee_service->getCurrentRegistrationFee();
+        $data =$this->registration_fee_service->getCurrentRegistrationFee($request);
         return $this->sendResponse(new RegisterFeeResource($data), 200);
     }
 

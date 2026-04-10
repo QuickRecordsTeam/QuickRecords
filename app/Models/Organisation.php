@@ -53,4 +53,19 @@ class Organisation extends Model
     {
         return $this->hasMany(Subscription::class);
     }
+
+    public function sessions()
+    {
+        return $this->hasMany(Session::class);
+    }
+
+    public function registrations()
+    {
+        return $this->hasMany(Registration::class);
+    }
+
+    public function memberInvitations()
+    {
+        return $this->hasMany(MemberInvitation::class);
+    }
 }
