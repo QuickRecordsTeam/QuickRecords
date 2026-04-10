@@ -20,11 +20,17 @@ class Registration extends Model
         'status',
         'updated_by',
         'is_compulsory',
-        'frequency'
+        'frequency',
+        'organisation_id'
     ];
 
     public function memberRegistrations()
     {
         return $this->hasMany(MemberRegistration::class);
+    }
+
+    public function organisation()
+    {
+        return $this->belongsTo(Organisation::class);
     }
 }

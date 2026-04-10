@@ -21,8 +21,14 @@ class MemberInvitation extends Model
         'expire_at',
         'has_seen_notification',
         'role_id',
-        'invitation_token'
+        'invitation_token',
+        'organisation'
     ];
+
+     public function organisation()
+    {
+        return $this->belongsTo(Organisation::class);
+    }
 
 
 }

@@ -32,7 +32,7 @@ class RegistrationService implements RegistrationInterface, TransactionDataGroup
         $current_session = $this->sessionService->getCurrentSession();
         $user = User::findOrFail($request->user_id);
         $exist_user = MemberRegistration::where('session_id', $current_session->id)->where('user_id', $user->id)->first();
-        $reg_fee = $this->registrationFeeService->getCurrentRegistrationFee();
+        $reg_fee = $this->registrationFeeService->getCurrentRegistrationFee($request);
         if(is_null($exist_user)){
             MemberRegistration::create([
                 'user_id'           => $user->id,

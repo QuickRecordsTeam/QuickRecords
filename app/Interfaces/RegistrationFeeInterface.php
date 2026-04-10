@@ -12,7 +12,7 @@ interface RegistrationFeeInterface
 
     public function getAllRegistrationFee($request);
 
-    public function getCurrentRegistrationFee();
+    public function getCurrentRegistrationFee($request);
 
     public function deleteRegistrationFee($id);
 

@@ -10,7 +10,6 @@ use App\Interfaces\RoleInterface;
 use App\Models\CustomRole;
 use App\Traits\HelpTrait;
 use App\Traits\ResponseTrait;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class RoleService implements RoleInterface
@@ -22,7 +21,7 @@ class RoleService implements RoleInterface
     {
         $user = User::findOrFail($user_id);
         $assignRole = CustomRole::findByName($role, 'api');
-        $member_has_role =  Roles::MEMBER == $assignRole->name ? false :  $this->checkIfRoleCanBeAdded($assignRole);
+        $member_has_role =  Roles::MEMBER == $assignRole->name ? false :  $this->checkIfRoleCanBeAdded($assignRole, $user->organisation);
 
         if (!$member_has_role) {
             $this->saveUserRole($user, $assignRole, $updated_by);
@@ -76,13 +75,17 @@ class RoleService implements RoleInterface
         return $role;
     }
 
-    private function checkIfRoleCanBeAdded($assign_role): bool
+    private function checkIfRoleCanBeAdded($assign_role, $organisation): bool
     {
+        if(!$organisation){
+            return false;
+        }
         $users = DB::table('users')
             ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
-            ->select('users.*')
+            ->where('model_has_roles.organisation_id', $organisation->id)
             ->where('roles.name', $assign_role->name)
+            ->select('users.*')
             ->count();
         return $assign_role->number_of_members == $users;
     }
