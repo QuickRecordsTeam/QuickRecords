@@ -9,7 +9,6 @@ use App\Http\Resources\BalanceSheetColumns;
 use App\Http\Resources\BalanceSheetResource;
 use App\Http\Resources\MemberInfoResource;
 use App\Http\Resources\MemberPaymentItemContributionResource;
-use App\Http\Resources\MemberPaymentItemResource;
 use App\Http\Resources\MemberYearlyPaymentResource;
 use App\Http\Resources\SessionResource;
 use App\Interfaces\BalanceSheetInterface;
@@ -52,7 +51,11 @@ class BalanceSheetService implements BalanceSheetInterface
 
         $session = $this->sessionService->getSessionById($request->session_id);
 
-        $registration = $this->registrationFeeService->getCurrentRegistrationFee($request);
+        try{
+            $registration = $this->registrationFeeService->getCurrentRegistrationFee($request);
+        }catch(\Exception $e){
+            $registration = null;
+        }
 
         $members = $this->userManagementService->getUsers($request->organisation_id);
 

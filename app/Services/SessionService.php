@@ -19,7 +19,7 @@ class SessionService implements SessionInterface
     {
         $organisation = $request->user()->organisation;
         $sessions = Session::where('organisation_id', $organisation->id)->orderBy('created_at', 'DESC')->get();
-        return SessionResource::collection($sessions->toArray());
+        return SessionResource::collection($sessions);
     }
     public function getCurrentSession()
     {

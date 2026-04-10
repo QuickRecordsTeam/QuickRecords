@@ -2,15 +2,22 @@
 
 namespace App\Services;
 
-use App\Exceptions\BusinessValidationException;
+use App\Constants\Roles;
 use App\Http\Resources\OrganisationResource;
 use App\Interfaces\OrganisationInterface;
 use App\Models\Organisation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrganisationService implements OrganisationInterface
 {
+
+    private RoleService $roleService;
+    public function __construct(RoleService $roleService)
+    {
+        $this->roleService = $roleService;
+    }
     public function updateOrganisationInfo($request)
     {
         $organisation = Organisation::find($request->id);
@@ -31,7 +38,6 @@ class OrganisationService implements OrganisationInterface
 
     public function createOrganisationAccount($request)
     {
-
         $user =  $request->user();
         $organisation = Organisation::firstOrCreate(
             [
@@ -54,6 +60,8 @@ class OrganisationService implements OrganisationInterface
         $user->update([
             'organisation_id' => $organisation->id
         ]);
+
+        $this->updateAdminUserRole($user, $organisation);
 
         return new OrganisationResource($organisation, $user->id, $user->username, $user->name);
     }
@@ -109,5 +117,26 @@ class OrganisationService implements OrganisationInterface
             $referralCode .= $characters[rand(0, $charactersLength - 1)];
         }
         return $referralCode;
+    }
+
+    private function updateAdminUserRole($user, $organisation)
+    {
+        $adminRole = $this->roleService->findRole(Roles::ADMIN);
+        $memberRole = $this->roleService->findRole(Roles::MEMBER);
+        $userRoles  = [$adminRole->id, $memberRole->id];
+
+        foreach ($userRoles as $roleId) {
+            DB::table('model_has_roles')->updateOrInsert(
+                [
+                    'model_id' => $user->id,
+                    'role_id' => $roleId,
+                    'model_type' => 'App\Models\User'
+                ],
+                [
+                    'organisation_id' => $organisation->id,
+                ]
+            );
+        }
+
     }
 }

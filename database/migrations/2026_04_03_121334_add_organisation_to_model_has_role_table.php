@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('model_has_roles', function (Blueprint $table) {
-             $table->uuid('organisation_id');
-             $table->foreign('organisation_id')->references('id')->on('organisations');
+            $table->uuid('organisation_id')->nullable(true);
         });
     }
 

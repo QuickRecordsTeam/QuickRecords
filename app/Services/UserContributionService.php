@@ -21,7 +21,6 @@ use App\Traits\HelpTrait;
 use Illuminate\Support\Facades\DB;
 use App\Constants\PaymentStatus;
 use App\Http\Resources\UserContributionCollection;
-use App\Http\Resources\UserNotContributedResource;
 
 class UserContributionService implements UserContributionInterface, TransactionDataGroupMgt
 {

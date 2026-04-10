@@ -10,7 +10,6 @@ use App\Interfaces\RoleInterface;
 use App\Models\CustomRole;
 use App\Traits\HelpTrait;
 use App\Traits\ResponseTrait;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class RoleService implements RoleInterface
@@ -78,6 +77,9 @@ class RoleService implements RoleInterface
 
     private function checkIfRoleCanBeAdded($assign_role, $organisation): bool
     {
+        if(!$organisation){
+            return false;
+        }
         $users = DB::table('users')
             ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
