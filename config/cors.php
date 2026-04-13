@@ -17,19 +17,13 @@ return [
 
     'paths' => ['api/*', 'broadcasting/auth', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://www.quickrecords.xyz', 'https://quickrecords.xyz', 'https://mountzioncm.com', 'https://www.mountzioncm.com', 'https://api.mountzioncm.com', 'https://www.api.mountzioncm.com', 'https://www.app.quickrecords.xyz', 'https://app.quickrecords.xyz',],
+    'allowed_origins' => ['https://app.quickrecords.xyz'],
 
-    'allowed_origins_patterns' => ["*"],
+    'allowed_origins_patterns' => [],
 
-    'allowed_headers' => [
-        'Content-Type',
-        'X-Requested-With',
-        'Authorization',
-        'Accept',
-        'X-XSRF-TOKEN',
-    ],
+    'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
 
