@@ -71,7 +71,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'isAuthorizedToSubscribe' =>  IsAuthorizedToSubscribe::class,
             'canAuthenticate' => CanAuthenticate::class
         ]);
-        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
        $exceptions->render(function (AuthenticationException $e, Request $request) {

@@ -17,13 +17,13 @@ class IsAuthorizedToCreateOrganisation
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
+        $user = $request->input('loginId') ? User::where('id', $request->input('loginId'))->first() : null;
 
         if (!$user) {
             return ResponseTrait::sendError('Access denied', 'You are not authorized to login', 403);
         }
 
-        $allowedRoles = ['ADMIN', 'PRESIDENT', 'FINANCIAL_SECRETARY', 'TREASURER', 'AUDITOR', 'SYSTEM_ADMIN'];
+        $allowedRoles = ['ADMIN', 'PRESIDENT', 'SYSTEM_ADMIN'];
         $userRoles = $user->roles->whereIn('name', $allowedRoles);
 
         if ($userRoles->isEmpty()) {

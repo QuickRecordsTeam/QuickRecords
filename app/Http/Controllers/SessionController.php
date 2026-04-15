@@ -36,6 +36,12 @@ class SessionController extends Controller
         return $this->sendResponse('success', 'Session set successfully');
     }
 
+    public function createInitSession(SessionRequest $request)
+    {
+        $this->sessionService->createSession($request);
+        return $this->sendResponse('success', 'Session set successfully');
+    }
+
     public function updateSession(Request $request)
     {
         $request->validate([
