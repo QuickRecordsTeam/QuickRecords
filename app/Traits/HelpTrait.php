@@ -100,6 +100,11 @@ trait HelpTrait
         return config('app.name');
     }
 
+    public function getRequestUser()
+    {
+        return request()->attributes->get('user');
+    }
+
 
     public static function getOrganisationAdministrators()
     {

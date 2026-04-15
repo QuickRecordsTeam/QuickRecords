@@ -9,11 +9,11 @@ use App\Http\Resources\SessionResource;
 use App\Http\Resources\SessionResourceCollection;
 use App\Interfaces\SessionInterface;
 use App\Models\Session;
-
+use App\Traits\HelpTrait;
 
 class SessionService implements SessionInterface
 {
-
+    use HelpTrait;
 
     public function getAllSessions($request)
     {
@@ -29,7 +29,7 @@ class SessionService implements SessionInterface
 
     public function createSession($request)
     {
-        $user = $request->user();
+        $user =  $this->getRequestUser();
         $organisation = $user->organisation;
         $previousSession =  Session::where('organisation_id', $organisation->id)->where('status', SessionStatus::ACTIVE)->first();
         if(isset($previousSession)) {

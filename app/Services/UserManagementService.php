@@ -229,8 +229,6 @@ class UserManagementService implements UserManagementInterface
         } else {
             Auth::login($user);
 
-            $request->session()->regenerate();
-
             $token = $this->generateToken($user);
 
             $hasLoginBefore = $this->checkIfUserHasLogin($user);
@@ -254,10 +252,6 @@ class UserManagementService implements UserManagementInterface
             'email_verified_at' => Carbon::now()->toDateTimeString()
         ]);
 
-        Auth::login($user);
-
-        $request->session()->regenerate();
-
         return new CreateAccountResource($user, $user->username, $user->email, $user->id);
     }
 
@@ -276,7 +270,7 @@ class UserManagementService implements UserManagementInterface
 
         Auth::login($user);
 
-        $request->session()->regenerate();
+
 
         $token = $this->generateToken($user);
 
@@ -514,9 +508,7 @@ class UserManagementService implements UserManagementInterface
         if (!Hash::check($request->password, $user->password)) {
             throw new BusinessValidationException("User account not found", 403);
         }
-        Auth::login($user);
 
-        $request->session()->regenerate();
         return new ClientVerificationResource($user);
     }
     private function generateToken($user)

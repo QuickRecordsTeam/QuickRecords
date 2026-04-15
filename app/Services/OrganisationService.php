@@ -6,13 +6,13 @@ use App\Constants\Roles;
 use App\Http\Resources\OrganisationResource;
 use App\Interfaces\OrganisationInterface;
 use App\Models\Organisation;
-use App\Models\User;
+use App\Traits\HelpTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrganisationService implements OrganisationInterface
 {
-
+    use HelpTrait;
     private RoleService $roleService;
     public function __construct(RoleService $roleService)
     {
@@ -38,7 +38,7 @@ class OrganisationService implements OrganisationInterface
 
     public function createOrganisationAccount($request)
     {
-        $user =  $request->user();
+        $user =  $this->getRequestUser();
         $organisation = Organisation::firstOrCreate(
             [
                 'id' => $request['id']

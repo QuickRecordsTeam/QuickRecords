@@ -52,7 +52,7 @@ Route::prefix('public/auth')->group(function () {
     Route::post('/reset-password-token', [UserController::class, 'setPasswordResetToken']);
     Route::post('/validate/password-reset', [UserController::class, 'validateResetToken']);
     Route::post('/reset-password', [UserController::class, 'resetPassword'])->middleware('canAuthenticate');
-    Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware(['auth:sanctum', 'isAuthorizedToCreateOrganisation']);
+    Route::post('/organisations/create-account', [OrganisationController::class, 'createOrganisationAccount'])->middleware(['isAuthorizedToCreateOrganisation']);
     Route::post('verify-client', [UserController::class, 'verifyClientAccount']);
 });
 
@@ -60,7 +60,7 @@ Route::prefix('public/quickrecords/')->group(function () {
     Route::post('send-inquiry-message', [InquiryController::class, 'sendMessage']);
 });
 
-Route::middleware(['auth:sanctum', 'isAuthorizedToSubscribe'])->group(function () {
+Route::middleware(['isAuthorizedToSubscribe'])->group(function () {
     Route::prefix('protected/init')->group(function () {
         Route::post('/subscriptions', [SubscriptionController::class, 'createSubscription']); //first subscription for the organisation, after this the user can access access the application. The payment must intercepted and either completed or set package set to trailing before the completion of this process
         Route::post('/client/subscriptions/{id}/payment-fee', [SubscriptionController::class, 'computeTotalSubscriptionAmount']);
@@ -68,6 +68,7 @@ Route::middleware(['auth:sanctum', 'isAuthorizedToSubscribe'])->group(function (
         Route::post('/client/subscriptions/payments/{id}/check-payment-status', [PaymentController::class, 'checkPaymentStatus']);
         Route::post('/client/subscriptions/incomplete', [SubscriptionController::class, 'getClientIncompleteSubscription']);
         Route::post('/subscriptions/trial', [SubscriptionController::class, 'getActivateSubscriptionTrial']);
+        Route::post('/sessions', [SessionController::class, 'createInitSession']);
     });
 });
 
