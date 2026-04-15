@@ -53,7 +53,7 @@ class SubscriptionService implements SubscriptionInterface
             ]
         );
 
-        return new SubscriptionResource($subscription, $request['login_id']);
+        return new SubscriptionResource($subscription, $request['loginId']);
     }
 
     public function getActivateSubscriptionTrial($request)
@@ -185,7 +185,7 @@ class SubscriptionService implements SubscriptionInterface
 
     public function getClientIncompleteSubscription($request)
     {
-        $user = User::find('id', $request['login_id'])->first();
+        $user = User::find('id', $request['loginId'])->first();
         if (!$user) {
             throw new BusinessValidationException("Invalid account or user", 403);
         }
