@@ -127,9 +127,9 @@ Route::middleware(['auth:sanctum', 'isAuthorizedToAccessPlatform'])->group(funct
 
     Route::prefix('protected')->group(function () {
         Route::put('/users/{id}', [UserController::class, 'updateUser'])->middleware('IsPresidentIsFinancialSecretaryIsTreasurerIsAdmin');
-        Route::put('/user/profile/update', [UserController::class, 'updateProfile'])->middleware('isUser');
-        Route::put('/user/member/profile/update', [UserController::class, 'updateMemberProfile'])->middleware('isUser');
-        Route::put('/user/profile/password/update', [UserController::class, 'updatePassword'])->middleware('isUser');
+        Route::put('/user/profile/update', [UserController::class, 'updateProfile']);
+        Route::put('/user/member/profile/update', [UserController::class, 'updateMemberProfile']);
+        Route::put('/user/profile/password/update', [UserController::class, 'updatePassword']);
     });
     Route::delete('protected/users/{id}', [UserController::class, 'deleteUser'])->middleware('isPresidentOrIsAdmin');
 
